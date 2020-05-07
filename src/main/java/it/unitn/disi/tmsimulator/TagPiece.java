@@ -7,6 +7,7 @@ package it.unitn.disi.tmsimulator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -86,13 +87,42 @@ public class TagPiece {
                 Integer i2 = varMap2.get(w);
                 Integer j2 = varMap2.get(v);
                 
-                if(! m1[i1][j1].equals(m2[i2][j2]) ||
-                   ! tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))
+                if(!m1[i1][j1].equals(m2[i2][j2]) ||
+                   !tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))
                     return false;
             }
         }
         
         return true;
+    }
+    
+    
+    // TODO: migliorare passando solo var non comuni
+    public static TagPiece union(TagPiece tp1, TagPiece tp2, 
+            HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
+            HashMap<String, Integer> varMapComp) throws Exception {
+        
+        Tag[][] matrix = new Tag[varMapComp.size()][varMapComp.size()];
+        Var[] labelingFunction = new Var[varMapComp.size()];
+        
+        for(Map.Entry<String, Integer> v : varMap1.entrySet()){
+            labelingFunction[varMapComp.get(v.getKey())] = tp1.labelingFunction(v.getValue());
+            for(Map.Entry<String, Integer> w : varMap1.entrySet()){
+                matrix[varMapComp.get(v.getKey())][varMapComp.get(w.getKey())] = 
+                        tp1.getMatrix()[v.getValue()][w.getValue()];
+            }
+        }
+        
+        for(Map.Entry<String, Integer> v : varMap2.entrySet()){
+            labelingFunction[varMapComp.get(v.getKey())] = tp2.labelingFunction(v.getValue());
+            for(Map.Entry<String, Integer> w : varMap2.entrySet()){
+                matrix[varMapComp.get(v.getKey())][varMapComp.get(w.getKey())] = 
+                        tp2.getMatrix()[v.getValue()][w.getValue()];
+            }
+        }        
+        
+        TagPiece tpComp = new TagPiece(matrix, labelingFunction);
+        return tpComp;
     }
 
 }

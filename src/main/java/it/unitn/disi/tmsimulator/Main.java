@@ -6,6 +6,7 @@
 package it.unitn.disi.tmsimulator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -43,8 +44,11 @@ public class Main {
         edges.add(edgesFrom0);
         edges.add(edgesFrom1);
         
-        
-        TagMachine tm = new TagMachine(variables, edges, initialState, acceptingStates, initialVarValues, new TagIntPlus());
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new TagIntPlus());
         tm.simulate(20, true, true);
     }
     

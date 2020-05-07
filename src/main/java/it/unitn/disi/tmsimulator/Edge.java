@@ -10,9 +10,9 @@ package it.unitn.disi.tmsimulator;
  * @author davide
  */
 public class Edge {
-    int fromState;
-    int toState;
-    TagPiece tagPiece;
+    private int fromState;
+    private int toState;
+    private TagPiece tagPiece;
 
     public Edge(int fromState, int toState, TagPiece tagPiece) {
         this.fromState = fromState;

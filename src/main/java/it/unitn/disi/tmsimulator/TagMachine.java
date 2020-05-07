@@ -20,13 +20,12 @@ public class TagMachine {
     private int initialState;
     private int[] acceptingStates;
     
-    // Tag[] initialTagValues;
     private Var[] initialVarValues;
     private Tag tagInstance;
 
-    public TagMachine(String[] variables, ArrayList<ArrayList<Edge>> edges, int initialState, 
-            int[] acceptingStates, /*Tag[] initialTagValues,*/ Var[] initialVarValues, Tag tagInstance) 
-            throws Exception {
+    public TagMachine(HashMap<String, Integer> varMap, ArrayList<ArrayList<Edge>> edges, 
+            int initialState, int[] acceptingStates, Var[] initialVarValues, 
+            Tag tagInstance) throws Exception {
         
         // alcuni controlli
         // TODO: fare controlli esaustivi
@@ -45,10 +44,7 @@ public class TagMachine {
         this.acceptingStates = acceptingStates; // TODO: ordinare ed eliminare doppioni
         this.tagInstance = tagInstance;
         
-        this.varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
+        this.varMap = varMap;
     }
 
     public HashMap<String, Integer> getVarMap() {
@@ -94,7 +90,7 @@ public class TagMachine {
             if(random)
                 nextStateIndex = ThreadLocalRandom.current().nextInt(edges.get(state).size());
             
-            TagPiece tagPiece = edges.get(state).get(nextStateIndex).tagPiece;
+            TagPiece tagPiece = edges.get(state).get(nextStateIndex).getTagPiece();
             tagVector = tagPiece.apply(tagVector);
             
             if(debug){
@@ -112,7 +108,7 @@ public class TagMachine {
                 behaviorsVarValue.get(varIndex).add(tagPiece.labelingFunction(varIndex));
             }
             
-            state = edges.get(state).get(nextStateIndex).toState;
+            state = edges.get(state).get(nextStateIndex).getToState();
             
         }
         
