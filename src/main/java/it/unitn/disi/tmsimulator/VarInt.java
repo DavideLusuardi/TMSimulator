@@ -24,5 +24,12 @@ public class VarInt extends Var {
     public Integer getValue() {
         return value;
     }
-    
+
+    @Override
+    public boolean equals(Var other) {
+        if(other == null || !(other instanceof VarInt))
+            return false;
+        
+        return this.value.equals(((VarInt)other).getValue());
+    }
 }

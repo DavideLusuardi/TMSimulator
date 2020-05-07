@@ -10,5 +10,5 @@ package it.unitn.disi.tmsimulator;
  * @author davide
  */
 public abstract class Var {
-
+    public abstract boolean equals(Var other);
 }

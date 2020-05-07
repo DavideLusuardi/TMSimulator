@@ -11,9 +11,14 @@ package it.unitn.disi.tmsimulator;
  */
 public abstract class Tag {
     
-    abstract Tag concatenate(Tag other) throws Exception;
-    abstract boolean gt(Tag other) throws Exception;
-    abstract boolean isEpsilon();
-    abstract Tag getIdentity();
-    abstract Tag getEpsilon();
+    public abstract Tag concatenate(Tag other) throws Exception;
+    public abstract boolean gt(Tag other) throws Exception;
+    public abstract boolean isEpsilon();
+    public abstract Tag getIdentity();
+    public abstract Tag getEpsilon();
+
+    public abstract boolean equals(Tag other);
+    
+    @Override
+    public abstract String toString();
 }

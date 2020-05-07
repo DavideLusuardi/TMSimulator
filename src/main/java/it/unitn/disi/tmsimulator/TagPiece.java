@@ -6,6 +6,7 @@
 package it.unitn.disi.tmsimulator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -67,9 +68,31 @@ public class TagPiece {
     public Integer[] domLabelingFunction(){
         return domLabelingFunction;
     }
+
+    public Tag[][] getMatrix() {
+        return matrix;
+    }
     
-    public boolean unifiable(TagPiece other){
-        return true; // TODO
+    public static boolean unifiable(TagPiece tp1, TagPiece tp2, 
+            HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
+            ArrayList<String> sharedVars){
+        
+        Tag[][] m1 = tp1.getMatrix();
+        Tag[][] m2 = tp2.getMatrix();
+        for(String w : sharedVars){
+            for(String v : sharedVars){
+                Integer i1 = varMap1.get(w);
+                Integer j1 = varMap1.get(v);
+                Integer i2 = varMap2.get(w);
+                Integer j2 = varMap2.get(v);
+                
+                if(! m1[i1][j1].equals(m2[i2][j2]) ||
+                   ! tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))
+                    return false;
+            }
+        }
+        
+        return true;
     }
 
 }

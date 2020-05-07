@@ -6,6 +6,8 @@
 package it.unitn.disi.tmsimulator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -13,14 +15,14 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author davide
  */
 public class TagMachine {
-    String[] variables;
-    ArrayList<ArrayList<Edge>> edges;
-    int initialState;
-    int[] acceptingStates;
+    private HashMap<String, Integer> varMap;
+    private ArrayList<ArrayList<Edge>> edges;
+    private int initialState;
+    private int[] acceptingStates;
     
     // Tag[] initialTagValues;
-    Var[] initialVarValues;
-    Tag tagInstance;
+    private Var[] initialVarValues;
+    private Tag tagInstance;
 
     public TagMachine(String[] variables, ArrayList<ArrayList<Edge>> edges, int initialState, 
             int[] acceptingStates, /*Tag[] initialTagValues,*/ Var[] initialVarValues, Tag tagInstance) 
@@ -37,16 +39,20 @@ public class TagMachine {
         
         //if(initialTagValues.length != variables.length || initialVarValues.length != variables.length)
         //    throw new Exception("dimensioni errate"); // TODO
-        
-        this.variables = variables;
+                
         this.edges = edges;
         this.initialState = initialState;
         this.acceptingStates = acceptingStates; // TODO: ordinare ed eliminare doppioni
         this.tagInstance = tagInstance;
+        
+        this.varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
     }
 
-    public String[] getVariables() {
-        return variables;
+    public HashMap<String, Integer> getVarMap() {
+        return varMap;
     }
 
     public ArrayList<ArrayList<Edge>> getEdges() {
@@ -70,14 +76,14 @@ public class TagMachine {
     }
     
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
-        Tag[] tagVector = new Tag[variables.length];
+        Tag[] tagVector = new Tag[varMap.size()];
         for(int i=0; i<tagVector.length; i++){
             tagVector[i] = tagInstance.getIdentity();
         }
         
-        ArrayList<ArrayList<Tag>> behaviorsTag = new ArrayList<>(variables.length);
-        ArrayList<ArrayList<Var>> behaviorsVarValue = new ArrayList<>(variables.length);
-        for(int i=0; i < variables.length; i++){
+        ArrayList<ArrayList<Tag>> behaviorsTag = new ArrayList<>(varMap.size());
+        ArrayList<ArrayList<Var>> behaviorsVarValue = new ArrayList<>(varMap.size());
+        for(int i=0; i < varMap.size(); i++){
             behaviorsTag.add(new ArrayList<>());
             behaviorsVarValue.add(new ArrayList<>());
         }
@@ -91,11 +97,14 @@ public class TagMachine {
             TagPiece tagPiece = edges.get(state).get(nextStateIndex).tagPiece;
             tagVector = tagPiece.apply(tagVector);
             
-            if(debug)
-                for(int j=0; j<tagVector.length; j++){
-                    System.out.print(variables[j]+": ");
-                    System.out.println(((TagIntPlus)tagVector[j]).getTag());                
+            if(debug){
+                for(Map.Entry<String, Integer> entry : varMap.entrySet()){
+                    String var = entry.getKey();
+                    Integer j = entry.getValue();
+                    System.out.print(var+": ");
+                    System.out.println(tagVector[j].toString());
                 }
+            }
             
             Integer[] updatedVarIndexes = tagPiece.domLabelingFunction();
             for(int varIndex : updatedVarIndexes){

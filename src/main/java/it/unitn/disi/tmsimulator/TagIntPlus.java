@@ -9,7 +9,7 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public class TagIntPlus extends Tag {
+public final class TagIntPlus extends Tag {
     public static final TagIntPlus EPSILON = new TagIntPlus(Integer.MIN_VALUE);
     public static final TagIntPlus IDENTITY = new TagIntPlus(0);
     
@@ -27,7 +27,7 @@ public class TagIntPlus extends Tag {
     }
     
     @Override
-    Tag concatenate(Tag other) throws Exception {
+    public Tag concatenate(Tag other) throws Exception {
         if(!(other instanceof TagIntPlus)){
             throw new Exception("la concatenazione richiede due tag dello stesso tipo");
         }
@@ -40,7 +40,7 @@ public class TagIntPlus extends Tag {
     }
 
     @Override
-    boolean gt(Tag other) throws Exception {
+    public boolean gt(Tag other) throws Exception {
         if(!(other instanceof TagIntPlus)){
             throw new Exception("la comparazione richiede due tag dello stesso tipo");
         }
@@ -49,18 +49,31 @@ public class TagIntPlus extends Tag {
     }
 
     @Override
-    boolean isEpsilon() {
+    public boolean isEpsilon() {
         return this.tag.equals(EPSILON.tag);
     }
 
     @Override
-    Tag getIdentity() {
+    public Tag getIdentity() {
         return IDENTITY;
     }
 
     @Override
-    Tag getEpsilon() {
+    public Tag getEpsilon() {
         return EPSILON;
+    }
+
+    @Override
+    public boolean equals(Tag other) {
+        if(other == null || !(other instanceof TagIntPlus))
+            return false;
+        
+        return this.tag.equals(((TagIntPlus)other).getTag());
+    }
+
+    @Override
+    public String toString() {
+        return this.tag.toString();
     }
 
 }
