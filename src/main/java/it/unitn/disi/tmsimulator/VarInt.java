@@ -9,16 +9,20 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public class IntVarValue extends VarValue {
+public class VarInt extends Var {
     Integer value;
 
-    public IntVarValue(Integer value) {
+    public VarInt(Integer value) {
         this.value = value;
     }
     
     @Override
     public String toString() {
         return value.toString();
+    }
+
+    public Integer getValue() {
+        return value;
     }
     
 }

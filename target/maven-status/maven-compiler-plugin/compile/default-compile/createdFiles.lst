@@ -1,8 +1,9 @@
 it/unitn/disi/tmsimulator/Edge.class
+it/unitn/disi/tmsimulator/Var.class
 it/unitn/disi/tmsimulator/Tag.class
-it/unitn/disi/tmsimulator/IntVarValue.class
+it/unitn/disi/tmsimulator/VarInt.class
 it/unitn/disi/tmsimulator/TagPiece.class
 it/unitn/disi/tmsimulator/TagIntPlus.class
+it/unitn/disi/tmsimulator/TagMachineHomoComposition.class
 it/unitn/disi/tmsimulator/TagMachine.class
 it/unitn/disi/tmsimulator/Main.class
-it/unitn/disi/tmsimulator/VarValue.class

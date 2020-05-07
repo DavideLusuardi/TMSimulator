@@ -18,6 +18,18 @@ public class Edge {
         this.fromState = fromState;
         this.toState = toState;
         this.tagPiece = tagPiece;
+    }
+
+    public int getFromState() {
+        return fromState;
+    }
+
+    public int getToState() {
+        return toState;
+    }
+
+    public TagPiece getTagPiece() {
+        return tagPiece;
     }    
     
 }

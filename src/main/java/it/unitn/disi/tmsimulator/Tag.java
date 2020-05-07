@@ -14,4 +14,6 @@ public abstract class Tag {
     abstract Tag concatenate(Tag other) throws Exception;
     abstract boolean gt(Tag other) throws Exception;
     abstract boolean isEpsilon();
+    abstract Tag getIdentity();
+    abstract Tag getEpsilon();
 }

@@ -9,6 +9,6 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public abstract class VarValue {
+public abstract class Var {
 
 }

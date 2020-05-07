@@ -13,19 +13,30 @@ public class TagIntPlus extends Tag {
     public static final TagIntPlus EPSILON = new TagIntPlus(Integer.MIN_VALUE);
     public static final TagIntPlus IDENTITY = new TagIntPlus(0);
     
-    public Integer tag;
+    private Integer tag;
     
     public TagIntPlus(Integer t){
         this.tag = t;
     }
 
+    public TagIntPlus() {
+    }
+
+    public Integer getTag() {
+        return tag;
+    }
+    
     @Override
     Tag concatenate(Tag other) throws Exception {
         if(!(other instanceof TagIntPlus)){
             throw new Exception("la concatenazione richiede due tag dello stesso tipo");
         }
 
-        return new TagIntPlus(this.tag + ((TagIntPlus) other).tag);
+        TagIntPlus t = new TagIntPlus(this.tag + ((TagIntPlus) other).tag);
+        if(this.isEpsilon() || other.isEpsilon())
+            t = EPSILON;
+        
+        return t;
     }
 
     @Override
@@ -39,8 +50,17 @@ public class TagIntPlus extends Tag {
 
     @Override
     boolean isEpsilon() {
-        return this.tag.equals(EPSILON);
+        return this.tag.equals(EPSILON.tag);
     }
-    
-    
+
+    @Override
+    Tag getIdentity() {
+        return IDENTITY;
+    }
+
+    @Override
+    Tag getEpsilon() {
+        return EPSILON;
+    }
+
 }

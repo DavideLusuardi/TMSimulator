@@ -17,7 +17,7 @@ public class Main {
         String[] variables = {"x", "y"};
         int initialState = 0;
         int[] acceptingStates = {1};
-        VarValue[] initialVarValues = {new IntVarValue(0), new IntVarValue(0)};
+        Var[] initialVarValues = {new VarInt(0), new VarInt(0)};
         
         ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
@@ -28,15 +28,15 @@ public class Main {
         TagIntPlus eps = TagIntPlus.EPSILON;
         
         TagIntPlus[][] m1 = {{id, eps},{eps, id}};
-        IntVarValue[] l1 = {null, null};        
+        VarInt[] l1 = {null, null};        
         
         TagIntPlus[][] m2 = {{one,one},{one,one}};
-        IntVarValue[] l2 = {new IntVarValue(0), new IntVarValue(0)};
+        VarInt[] l2 = {new VarInt(0), new VarInt(0)};
         edgesFrom0.add(new Edge(0, 1, new TagPiece(m2, l2)));
         edgesFrom0.add(new Edge(0, 0, new TagPiece(m1, l1)));
         
         TagIntPlus[][] m3 = {{id,one},{eps,one}};
-        IntVarValue[] l3 = {null, new IntVarValue(0)};
+        VarInt[] l3 = {null, new VarInt(0)};
         edgesFrom1.add(new Edge(1, 0, new TagPiece(m3, l3)));
         edgesFrom1.add(new Edge(1, 1, new TagPiece(m1, l1)));
         
@@ -44,8 +44,8 @@ public class Main {
         edges.add(edgesFrom1);
         
         
-        TagMachine tm = new TagMachine(variables, edges, initialState, acceptingStates, initialVarValues);
-        tm.simulate(10);
+        TagMachine tm = new TagMachine(variables, edges, initialState, acceptingStates, initialVarValues, new TagIntPlus());
+        tm.simulate(20, true, true);
     }
     
     public static void main(String[] args) throws Exception {

@@ -1,8 +1,9 @@
+/home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/VarInt.java
+/home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/Var.java
 /home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/TagMachine.java
 /home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/Tag.java
-/home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/IntVarValue.java
 /home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/TagIntPlus.java
 /home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/TagPiece.java
-/home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/VarValue.java
+/home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/TagMachineHomoComposition.java
 /home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/Main.java
 /home/davide/NetBeansProjects/TMSimulator/src/main/java/it/unitn/disi/tmsimulator/Edge.java
