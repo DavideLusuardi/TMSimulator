@@ -39,12 +39,12 @@ public class TagMachine {
         //if(initialTagValues.length != variables.length || initialVarValues.length != variables.length)
         //    throw new Exception("dimensioni errate"); // TODO
                 
+        this.varMap = varMap;
         this.edges = edges;
         this.initialState = initialState;
         this.acceptingStates = acceptingStates; // TODO: ordinare ed eliminare doppioni
-        this.tagInstance = tagInstance;
-        
-        this.varMap = varMap;
+        this.initialVarValues = initialVarValues;
+        this.tagInstance = tagInstance;        
     }
 
     public HashMap<String, Integer> getVarMap() {
@@ -94,6 +94,8 @@ public class TagMachine {
             tagVector = tagPiece.apply(tagVector);
             
             if(debug){
+                System.out.println(String.format("%d -> %d", edges.get(state).get(nextStateIndex).getFromState(), 
+                        edges.get(state).get(nextStateIndex).getToState()));
                 for(Map.Entry<String, Integer> entry : varMap.entrySet()){
                     String var = entry.getKey();
                     Integer j = entry.getValue();

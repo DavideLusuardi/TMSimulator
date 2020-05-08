@@ -28,6 +28,8 @@ public final class TagIntPlus extends Tag {
     
     @Override
     public Tag concatenate(Tag other) throws Exception {
+        if(other == null)
+            throw new Exception("other = null"); // TODO
         if(!(other instanceof TagIntPlus)){
             throw new Exception("la concatenazione richiede due tag dello stesso tipo");
         }

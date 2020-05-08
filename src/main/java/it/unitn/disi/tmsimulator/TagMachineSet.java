@@ -12,7 +12,7 @@ import java.util.HashMap;
  *
  * @author davide
  */
-public class TagMachineHomoComposition extends ArrayList<TagMachine> {
+public class TagMachineSet extends ArrayList<TagMachine> {
     
     public TagMachine compose() throws Exception {
         if(this.size() < 2)
@@ -40,15 +40,54 @@ public class TagMachineHomoComposition extends ArrayList<TagMachine> {
             for(int j=0; j<compositionMatrix[0].length; j++)
                 compositionMatrix[i][j] = -1;
         
+        ArrayList<Integer> stateMap1 = new ArrayList<>();
+        ArrayList<Integer> stateMap2 = new ArrayList<>();
+        
+        edges.add(new ArrayList<>());
+        compositionMatrix[tm1.getInitialState()][tm2.getInitialState()] = 0;
+        stateMap1.add(tm1.getInitialState());
+        stateMap2.add(tm2.getInitialState());
+        
+        int sComp=0;
+        while(edges.size() > sComp){
+            int s1 = stateMap1.get(sComp);
+            int s2 = stateMap2.get(sComp);
+            for(Edge e1 : tm1.getEdges().get(s1)){
+                for(Edge e2 : tm2.getEdges().get(s2)){
+                    if(TagPiece.unifiable(e1.getTagPiece(), e2.getTagPiece(), 
+                            tm1.getVarMap(), tm2.getVarMap(), sharedVars)){
+
+                        System.out.println(String.format("unifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
+
+                        TagPiece tp = TagPiece.union(e1.getTagPiece(), e2.getTagPiece(), 
+                                tm1.getVarMap(), tm2.getVarMap(), varMap, tm1.getTagInstance().getEpsilon()); // TODO
+
+                        if(compositionMatrix[e1.getToState()][e2.getToState()] == -1){
+                            compositionMatrix[e1.getToState()][e2.getToState()] = edges.size();
+                            stateMap1.add(e1.getToState());
+                            stateMap2.add(e2.getToState());
+                            edges.add(new ArrayList<>());
+                        }
+                        Edge e = new Edge(sComp, compositionMatrix[e1.getToState()][e2.getToState()], tp);
+                        edges.get(sComp).add(e);
+                    }
+                }
+            }
+            sComp++;
+        }
+        
+        /* 
         for(int i=0; i<tm1.getEdges().size(); i++){
             for(Edge e1 : tm1.getEdges().get(i)){
-                for(int j=0; i<tm2.getEdges().size(); j++){
+                for(int j=0; j<tm2.getEdges().size(); j++){
                     for(Edge e2 : tm2.getEdges().get(j)){
                         if(TagPiece.unifiable(e1.getTagPiece(), e2.getTagPiece(), 
                                 tm1.getVarMap(), tm2.getVarMap(), sharedVars)){
                             
+                            System.out.println(String.format("unifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
+                            
                             TagPiece tp = TagPiece.union(e1.getTagPiece(), e2.getTagPiece(), 
-                                    tm1.getVarMap(), tm2.getVarMap(), varMap); // TODO
+                                    tm1.getVarMap(), tm2.getVarMap(), varMap, tm1.getTagInstance().getEpsilon()); // TODO
                             
                             if(compositionMatrix[i][j] == -1){
                                 compositionMatrix[i][j] = edges.size();
@@ -65,6 +104,7 @@ public class TagMachineHomoComposition extends ArrayList<TagMachine> {
                 }
             }
         }
+        */
         
         int initialState = compositionMatrix[tm1.getInitialState()][tm2.getInitialState()];
         ArrayList<Integer> acceptingStates = new ArrayList<>();
@@ -75,6 +115,16 @@ public class TagMachineHomoComposition extends ArrayList<TagMachine> {
             }
         }
         
-        tmComp = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, tagInstance);
+        int[] accStates = new int[acceptingStates.size()];
+        for(int i=0; i<acceptingStates.size(); i++)
+            accStates[i] = acceptingStates.get(i); // TODO
+        
+        Var[] initialVarValues = new Var[varMap.size()];
+        for(int i=0; i<initialVarValues.length; i++){
+            initialVarValues[i] = tm1.getInitialVarValues()[0]; // TODO
+        }
+        
+        TagMachine tmComp = new TagMachine(varMap, edges, initialState, accStates, initialVarValues, tm1.getTagInstance());
+        return tmComp;
     }
 }

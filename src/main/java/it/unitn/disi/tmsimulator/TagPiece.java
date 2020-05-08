@@ -50,9 +50,9 @@ public class TagPiece {
         // TODO: gestire quando è presente epsilon e quando ordinamento parziale (-> non esiste max)
         Tag[] tagVectorPrime = new Tag[tagVector.length];
         for(int i=0; i < tagVector.length; i++){
-            Tag tMax = tagVector[0].concatenate(matrix[0][i]);
+            Tag tMax = tagVector[i]; // nel caso in cui tag piece ha una colonna di epsilon, il tag non cambia
             
-            for(int j=1; j < tagVector.length; j++){
+            for(int j=0; j < tagVector.length; j++){
                 Tag t = tagVector[j].concatenate(matrix[j][i]);
                 if(t.gt(tMax)){
                     tMax = t;
@@ -87,9 +87,11 @@ public class TagPiece {
                 Integer i2 = varMap2.get(w);
                 Integer j2 = varMap2.get(v);
                 
-                if(!m1[i1][j1].equals(m2[i2][j2]) ||
-                   !tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))
+                if(!m1[i1][j1].equals(m2[i2][j2]) || !(tp1.labelingFunction(j1) == null && 
+                        tp2.labelingFunction(j2) == null || tp1.labelingFunction(j1) != null && 
+                        tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2))) ){
                     return false;
+                }
             }
         }
         
@@ -100,10 +102,16 @@ public class TagPiece {
     // TODO: migliorare passando solo var non comuni
     public static TagPiece union(TagPiece tp1, TagPiece tp2, 
             HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
-            HashMap<String, Integer> varMapComp) throws Exception {
+            HashMap<String, Integer> varMapComp, Tag epsilon) throws Exception {
         
         Tag[][] matrix = new Tag[varMapComp.size()][varMapComp.size()];
         Var[] labelingFunction = new Var[varMapComp.size()];
+        
+        for(int i=0; i<matrix.length; i++){
+            for(int j=0; j<matrix[0].length; j++){
+                matrix[i][j] = epsilon;
+            }
+        }
         
         for(Map.Entry<String, Integer> v : varMap1.entrySet()){
             labelingFunction[varMapComp.get(v.getKey())] = tp1.labelingFunction(v.getValue());

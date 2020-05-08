@@ -4,6 +4,6 @@ it/unitn/disi/tmsimulator/Tag.class
 it/unitn/disi/tmsimulator/VarInt.class
 it/unitn/disi/tmsimulator/TagPiece.class
 it/unitn/disi/tmsimulator/TagIntPlus.class
-it/unitn/disi/tmsimulator/TagMachineHomoComposition.class
 it/unitn/disi/tmsimulator/TagMachine.class
 it/unitn/disi/tmsimulator/Main.class
+it/unitn/disi/tmsimulator/TagMachineSet.class
