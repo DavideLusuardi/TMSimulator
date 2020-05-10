@@ -74,6 +74,14 @@ public class TagPiece {
         return matrix;
     }
     
+    public void applyMorphism(TagMorphism tagMorphism) throws Exception {
+        for(int i=0; i<this.matrix.length; i++){
+            for(int j=0; j<this.matrix.length; j++){
+                this.matrix[i][j] = tagMorphism.map(this.matrix[i][j]);
+            }
+        }
+    }
+    
     public static boolean unifiable(TagPiece tp1, TagPiece tp2, 
             HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
             ArrayList<String> sharedVars){

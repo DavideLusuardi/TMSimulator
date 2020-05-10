@@ -23,6 +23,7 @@ public class TagMachine {
     private Var[] initialVarValues;
     private Tag tagInstance;
 
+    // TODO: gestire TM con un solo stato e senza accepting states o non raggiungibili
     public TagMachine(HashMap<String, Integer> varMap, ArrayList<ArrayList<Edge>> edges, 
             int initialState, int[] acceptingStates, Var[] initialVarValues, 
             Tag tagInstance) throws Exception {
@@ -71,6 +72,21 @@ public class TagMachine {
         return tagInstance;
     }
     
+    
+    // TODO: si può generare una nuova tag machine
+    public void applyMorphism(TagMorphism tagMorphism) throws Exception {
+        if(tagMorphism == null)
+            return;
+        
+        this.tagInstance = tagMorphism.getTagInstance();
+        
+        for(ArrayList<Edge> edgeList : this.edges){
+            for(Edge e : edgeList){
+                e.getTagPiece().applyMorphism(tagMorphism);
+            }
+        }
+    }
+    
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
         Tag[] tagVector = new Tag[varMap.size()];
         for(int i=0; i<tagVector.length; i++){
@@ -88,7 +104,7 @@ public class TagMachine {
         for(int i=0; i<steps; i++){
             int nextStateIndex = 0;
             if(random)
-                nextStateIndex = ThreadLocalRandom.current().nextInt(edges.get(state).size());
+                nextStateIndex = ThreadLocalRandom.current().nextInt(edges.get(state).size()); // TODO: gestire quando c'è un solo stato
             
             TagPiece tagPiece = edges.get(state).get(nextStateIndex).getTagPiece();
             tagVector = tagPiece.apply(tagVector);
@@ -114,6 +130,30 @@ public class TagMachine {
             
         }
         
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("initial state: %d\n", initialState));
+        
+        sb.append("accepting states: ");
+        for(Integer s : acceptingStates){
+            sb.append(String.format("%d, ", s));
+        }
+        
+        sb.append("\n\nedges\n");
+        
+        int i=0;
+        for(ArrayList<Edge> edgeList : edges){
+            sb.append(String.format("state %d: ", i++));
+            for(Edge e : edgeList){
+                sb.append(String.format("%d, ", e.getToState()));
+            }
+            sb.append("\n");
+        }
+        
+        return sb.toString();
     }
     
 }

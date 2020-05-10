@@ -9,17 +9,17 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public final class TagIntPlus extends Tag {
-    public static final TagIntPlus EPSILON = new TagIntPlus(Integer.MIN_VALUE);
-    public static final TagIntPlus IDENTITY = new TagIntPlus(0);
+public final class MaxPlusInteger extends Tag {
+    public static final MaxPlusInteger EPSILON = new MaxPlusInteger(Integer.MIN_VALUE);
+    public static final MaxPlusInteger IDENTITY = new MaxPlusInteger(0);
     
     private Integer tag;
     
-    public TagIntPlus(Integer t){
+    public MaxPlusInteger(Integer t){
         this.tag = t;
     }
 
-    public TagIntPlus() {
+    public MaxPlusInteger() {
     }
 
     public Integer getTag() {
@@ -30,11 +30,11 @@ public final class TagIntPlus extends Tag {
     public Tag concatenate(Tag other) throws Exception {
         if(other == null)
             throw new Exception("other = null"); // TODO
-        if(!(other instanceof TagIntPlus)){
+        if(!(other instanceof MaxPlusInteger)){
             throw new Exception("la concatenazione richiede due tag dello stesso tipo");
         }
 
-        TagIntPlus t = new TagIntPlus(this.tag + ((TagIntPlus) other).tag);
+        MaxPlusInteger t = new MaxPlusInteger(this.tag + ((MaxPlusInteger) other).tag);
         if(this.isEpsilon() || other.isEpsilon())
             t = EPSILON;
         
@@ -43,11 +43,11 @@ public final class TagIntPlus extends Tag {
 
     @Override
     public boolean gt(Tag other) throws Exception {
-        if(!(other instanceof TagIntPlus)){
+        if(!(other instanceof MaxPlusInteger)){
             throw new Exception("la comparazione richiede due tag dello stesso tipo");
         }
         
-        return this.tag > ((TagIntPlus) other).tag;
+        return this.tag > ((MaxPlusInteger) other).tag;
     }
 
     @Override
@@ -67,10 +67,10 @@ public final class TagIntPlus extends Tag {
 
     @Override
     public boolean equals(Tag other) {
-        if(other == null || !(other instanceof TagIntPlus))
+        if(other == null || !(other instanceof MaxPlusInteger))
             return false;
         
-        return this.tag.equals(((TagIntPlus)other).getTag());
+        return this.tag.equals(((MaxPlusInteger)other).getTag());
     }
 
     @Override

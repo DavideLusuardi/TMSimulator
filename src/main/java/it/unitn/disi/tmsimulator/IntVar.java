@@ -9,10 +9,10 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public class VarInt extends Var {
+public class IntVar extends Var {
     Integer value;
 
-    public VarInt(Integer value) {
+    public IntVar(Integer value) {
         this.value = value;
     }
     
@@ -27,9 +27,9 @@ public class VarInt extends Var {
 
     @Override
     public boolean equals(Var other) {
-        if(other == null || !(other instanceof VarInt))
+        if(other == null || !(other instanceof IntVar))
             return false;
         
-        return this.value.equals(((VarInt)other).getValue());
+        return this.value.equals(((IntVar)other).getValue());
     }
 }
