@@ -9,29 +9,29 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public class IntVar extends Var {
-    Integer value;
+public class BoolVar extends Var {
+    Boolean value;
 
-    public IntVar(Integer value) {
+    public BoolVar(Boolean value) {
         this.value = value;
     }
-    
-    @Override
-    public Integer getValue() {
-        return value;
-    }
 
     @Override
+    public Boolean getValue() {
+        return value;
+    }
+        
+    @Override
     public Var newInstance(Object value) {
-        return new IntVar((Integer)value);
+        return new BoolVar((Boolean)value);
     }
 
     @Override
     public boolean equals(Var other) {
-        if(other == null || !(other instanceof IntVar))
+        if(other == null || !(other instanceof BoolVar))
             return false;
         
-        return this.value.equals(((IntVar)other).getValue());
+        return this.value.equals(((BoolVar)other).getValue());
     }
     
     @Override

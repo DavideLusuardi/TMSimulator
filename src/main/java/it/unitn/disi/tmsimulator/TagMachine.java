@@ -74,7 +74,7 @@ public class TagMachine {
     
     
     // TODO: si può generare una nuova tag machine
-    public void applyMorphism(TagMorphism tagMorphism) throws Exception {
+    public void applyMorphism(Morphism tagMorphism) throws Exception {
         if(tagMorphism == null)
             return;
         

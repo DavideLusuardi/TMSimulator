@@ -9,29 +9,33 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public class IntVar extends Var {
-    Integer value;
+public class FloatVar extends Var {
+    Float value;
 
-    public IntVar(Integer value) {
+    public FloatVar(Float value) {
         this.value = value;
     }
     
+    public FloatVar(Integer value){
+        this((float) value);
+    }
+
     @Override
-    public Integer getValue() {
+    public Float getValue() {
         return value;
     }
 
     @Override
     public Var newInstance(Object value) {
-        return new IntVar((Integer)value);
+        return new FloatVar((Float)value);
     }
 
     @Override
     public boolean equals(Var other) {
-        if(other == null || !(other instanceof IntVar))
+        if(other == null || !(other instanceof FloatVar))
             return false;
         
-        return this.value.equals(((IntVar)other).getValue());
+        return this.value.equals(((FloatVar)other).getValue());
     }
     
     @Override

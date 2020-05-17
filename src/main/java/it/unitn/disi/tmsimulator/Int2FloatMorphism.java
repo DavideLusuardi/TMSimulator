@@ -9,22 +9,22 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public class IntMorphism extends Morphism {
+public class Int2FloatMorphism extends Morphism {
 
     // applica il mapping tag' = alpha*tag
-    private Integer alpha;
+    private Float alpha;
 
-    public IntMorphism(Integer alpha) {
+    public Int2FloatMorphism(Float alpha) {
         this.alpha = alpha;
     }
 
-    public IntMorphism() {
-        this(1);
+    public Int2FloatMorphism() {
+        this(new Float(1));
     }
 
     @Override
     public Tag getTagInstance() {
-        return new MaxPlusInteger();
+        return new MaxPlusFloat();
     }
     
     @Override
@@ -35,7 +35,7 @@ public class IntMorphism extends Morphism {
         if(tag.isEpsilon())
             return getTagInstance().getEpsilon();
         else        
-            return new MaxPlusInteger(alpha*((MaxPlusInteger)tag).getTag());
+            return new MaxPlusFloat(alpha*((MaxPlusInteger)tag).getTag());
     }
     
     

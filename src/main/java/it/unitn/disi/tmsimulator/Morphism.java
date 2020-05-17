@@ -9,7 +9,7 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public abstract class TagMorphism {
+public abstract class Morphism {
     public abstract Tag map(Tag tag) throws Exception;
     public abstract Tag getTagInstance();
 }

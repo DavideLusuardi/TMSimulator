@@ -136,7 +136,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         return tmComp;
     }
     
-    public TagMachine compose(ArrayList<TagMorphism> tagMorphismList) throws Exception {
+    public TagMachine compose(ArrayList<Morphism> tagMorphismList) throws Exception {
         if(this.size() < 2)
             throw new Exception("la composizione richiede almeno due TagMachine");
         else if(tagMorphismList.size() != this.size())

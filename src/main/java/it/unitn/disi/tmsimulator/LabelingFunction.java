@@ -9,8 +9,6 @@ package it.unitn.disi.tmsimulator;
  *
  * @author davide
  */
-public abstract class Var {
-    public abstract Object getValue();
-    public abstract Var newInstance(Object value);
-    public abstract boolean equals(Var other);
+public abstract class LabelingFunction {
+    public abstract Var apply(Var varValues[]);
 }

@@ -204,6 +204,79 @@ public class Main {
         tmComp.simulate(20, true, true);
     }
     
+    public TagMachine generateTm5() throws Exception {
+        float a11  = (float) -2.671;
+        float a12  = (float) -21.54;
+        float a21  = (float) 21.54;
+        float a22  = (float) -2.671;
+        float ap11 = (float) 0;
+        float ap12 = (float) 1;
+        float ap13 = (float) -7.556;
+        float ap21 = (float) -448.1;
+        float ap22 = (float) -5.186;
+        float ap23 = (float) 30.87;
+        float ap31 = (float) 3.042;
+        float ap32 = (float) 0.02773;
+        float ap33 = (float) -0.2105;  
+        float M    = (float) 12.41;
+        float b11  = (float) 1.92339;
+        float b21  = (float) -14.323085;
+        float bp11 = (float) 0;
+        float bp21 = (float) 15.05;
+        float bp31 = (float) 0;
+        float d    = (float) 0.0011810;  
+        float v11  = (float) 0.0101152;
+        float v12  = (float) -0.9999488;  
+        float i1   = (float) 0.4;
+        float i2   = (float) 0.6;
+        float c12  = (float) 0.0379945;
+        float c13  = (float) -0.0025700; 
+        
+        String[] variables = {"x11", "x21", "sm11", "sm21", "sm31", "fai", "pfai", "rot", "cutoff", "torque", "aw"};
+        int initialState = 0;
+        int[] acceptingStates = {0};
+        Var[] initialVarValues = {new FloatVar(36), new FloatVar(1), new FloatVar((float)-4.4857183), 
+            new FloatVar(2660), new FloatVar((float)352.0831), new FloatVar(0), 
+            new FloatVar(0), new BoolVar(false), new BoolVar(false), new FloatVar((float)12.41), new FloatVar((float)1.3652334)};
+        
+        ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
+        ArrayList<Edge> edgesFrom0 = new ArrayList<>();
+        edges.add(edgesFrom0);
+        
+        MaxPlusFloat d1 = new MaxPlusFloat(d);
+        MaxPlusFloat[][] mu = {{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1}};
+        
+        LabelingFunction lb = new LabelingFunction() {
+            @Override
+            public Var apply(Var[] varValues) {
+                
+            }
+        }
+        
+        Var[] l = {
+            new FloatVar(x11 + d*(a11*x11 + a12*x21 + b11*torque)),
+            new FloatVar(x21 + d*(a21*x11 + a22*x21 + b21*torque)),
+            new FloatVar(c12*x11+c13*x21),
+            new FloatVar(sm11 + d*(ap11*sm11 + ap12*sm21 + ap13*sm31) + bp11*torque),
+            new FloatVar(sm21 + d*(ap21*sm11 + ap22*sm21 + ap23*sm31) + bp21*torque),
+            new FloatVar(sm31 + d*(ap31*sm11 + ap32*sm21 + ap33*sm31) + bp31*torque),
+            new FloatVar(fai + d*sm21/60),
+            new BoolVar(((fai-pfai>=i1) && (fai-pfai<=i2))*fai + (1-((fai-pfai>=i1) && (fai-pfai<=i2)))*pfai),
+            new BoolVar((fai-pfai>=i1) && (fai-pfai<=i2)),
+            new FloatVar(cutoff || (v11*x11+v12*x21>=0)),
+            new FloatVar(0)
+        };
+        
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l)));
+        
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        return tm;        
+    }
+    
     public static void main(String[] args) throws Exception {
         Main m = new Main();
         m.runExample2();
