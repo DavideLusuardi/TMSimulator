@@ -123,7 +123,7 @@ public class TagMachine {
             Integer[] updatedVarIndexes = tagPiece.domLabelingFunction();
             for(int varIndex : updatedVarIndexes){
                 behaviorsTag.get(varIndex).add(tagVector[varIndex]);
-                behaviorsVarValue.get(varIndex).add(tagPiece.labelingFunction(varIndex));
+                // behaviorsVarValue.get(varIndex).add(tagPiece.labelingFunction(varIndex)); // TODO
             }
             
             state = edges.get(state).get(nextStateIndex).getToState();

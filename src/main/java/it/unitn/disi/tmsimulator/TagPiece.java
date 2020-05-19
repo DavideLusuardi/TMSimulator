@@ -14,12 +14,12 @@ import java.util.Map;
  * @author davide
  */
 public class TagPiece {
-    private Tag[][] matrix;
-    private Var[] labelingFunction;
-    private Integer[] domLabelingFunction;
+    final private Tag[][] matrix;
+    final private LabelingFunction[] labelingFunction;
+    final private Integer[] domLabelingFunction;
 
     // TODO: controllare che tag cambia quando var appartiene a Dom(v)
-    public TagPiece(Tag[][] matrix, Var[] labelingFunction) throws Exception {
+    public TagPiece(Tag[][] matrix, LabelingFunction[] labelingFunction) throws Exception {
         if(matrix.length == 0 || matrix.length != matrix[0].length){
             throw new Exception("la matrice TagPiece deve essere quadrata");
         }        
@@ -35,11 +35,40 @@ public class TagPiece {
             if(labelingFunction[i] != null)
                 indexes.add(i);
         }
-        domLabelingFunction = indexes.toArray(new Integer[0]);
+        this.domLabelingFunction = indexes.toArray(new Integer[0]);
+    }
+    
+    public TagPiece(Tag[][] matrix, Var[] labelingFunction) throws Exception {
+        if(matrix.length == 0 || matrix.length != matrix[0].length){
+            throw new Exception("la matrice TagPiece deve essere quadrata");
+        }        
+        this.matrix = matrix;
+        
+        if(labelingFunction.length != matrix.length){
+            throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
+        }
+        
+        this.labelingFunction = new LabelingFunction[labelingFunction.length];
+        for(int i=0; i<labelingFunction.length; i++){
+            final Var v = labelingFunction[i];
+            this.labelingFunction[i] = new LabelingFunction() {
+                @Override
+                public Var apply(Var[] varValues) {
+                    return v;
+                }
+            };
+        }
+        
+        ArrayList<Integer> indexes = new ArrayList<>();
+        for(int i=0; i<labelingFunction.length; i++){
+            if(labelingFunction[i] != null)
+                indexes.add(i);
+        }
+        this.domLabelingFunction = indexes.toArray(new Integer[0]);
     }
 
-    public Var labelingFunction(int varIndex) {
-        return labelingFunction[varIndex];
+    public Var labelingFunction(int varIndex, Var[] varVector) {
+        return labelingFunction[varIndex].apply(varVector);
     }
     
     public Tag[] apply(Tag[] tagVector) throws Exception {
@@ -64,7 +93,10 @@ public class TagPiece {
         
         return tagVectorPrime;
     }
-    
+
+    public LabelingFunction[] getLabelingFunction() {
+        return labelingFunction;
+    }
     
     public Integer[] domLabelingFunction(){
         return domLabelingFunction;
@@ -95,9 +127,9 @@ public class TagPiece {
                 Integer i2 = varMap2.get(w);
                 Integer j2 = varMap2.get(v);
                 
-                if(!m1[i1][j1].equals(m2[i2][j2]) || !(tp1.labelingFunction(j1) == null && 
+                if(!m1[i1][j1].equals(m2[i2][j2]) /*|| !(tp1.labelingFunction(j1) == null && 
                         tp2.labelingFunction(j2) == null || tp1.labelingFunction(j1) != null && 
-                        tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2))) ){
+                        tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))*/ ){
                     return false;
                 }
             }
@@ -113,7 +145,8 @@ public class TagPiece {
             HashMap<String, Integer> varMapComp, Tag epsilon) throws Exception {
         
         Tag[][] matrix = new Tag[varMapComp.size()][varMapComp.size()];
-        Var[] labelingFunction = new Var[varMapComp.size()];
+        // Var[] labelingFunction = new Var[varMapComp.size()];
+        LabelingFunction[] labelingFunction = new LabelingFunction[varMapComp.size()];
         
         for(int i=0; i<matrix.length; i++){
             for(int j=0; j<matrix[0].length; j++){
@@ -122,7 +155,7 @@ public class TagPiece {
         }
         
         for(Map.Entry<String, Integer> v : varMap1.entrySet()){
-            labelingFunction[varMapComp.get(v.getKey())] = tp1.labelingFunction(v.getValue());
+            labelingFunction[varMapComp.get(v.getKey())] = tp1.getLabelingFunction()[v.getValue()];
             for(Map.Entry<String, Integer> w : varMap1.entrySet()){
                 matrix[varMapComp.get(v.getKey())][varMapComp.get(w.getKey())] = 
                         tp1.getMatrix()[v.getValue()][w.getValue()];
@@ -130,7 +163,7 @@ public class TagPiece {
         }
         
         for(Map.Entry<String, Integer> v : varMap2.entrySet()){
-            labelingFunction[varMapComp.get(v.getKey())] = tp2.labelingFunction(v.getValue());
+            labelingFunction[varMapComp.get(v.getKey())] = tp2.getLabelingFunction()[v.getValue()];
             for(Map.Entry<String, Integer> w : varMap2.entrySet()){
                 matrix[varMapComp.get(v.getKey())][varMapComp.get(w.getKey())] = 
                         tp2.getMatrix()[v.getValue()][w.getValue()];
