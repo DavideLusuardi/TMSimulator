@@ -30,6 +30,6 @@ public class Edge {
 
     public TagPiece getTagPiece() {
         return tagPiece;
-    }    
+    }
     
 }

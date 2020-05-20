@@ -244,7 +244,7 @@ public class Main {
         edges.add(edgesFrom0);
         
         MaxPlusFloat d1 = new MaxPlusFloat(d);
-        MaxPlusFloat[][] mu = {{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1}};
+        Tag[][] mu = {{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1}};
         
         float z = (float)0;
         Float p1[] = {1+d*a11, d*a12, z, z, z, z, z, z, z, d*b11, z}; // x11 + d*(a11*x11 + a12*x21 + b11*torque)
@@ -332,8 +332,8 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         edges.add(edgesFrom0);
         
-        MaxPlusInteger d1 = new MaxPlusInteger(1);
-        MaxPlusInteger[][] mu = {{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1}};
+        MaxPlusFloat d1 = new MaxPlusFloat((float)1.0);
+        Tag[][] mu = {{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1}};
         
         Var[] l1 = {new BoolVar(true), new BoolVar(true), new IntVar(0), new FloatVar(0)};
         Var[] l2 = {new BoolVar(true), new BoolVar(false), new IntVar(1), new FloatVar(M)};
@@ -349,7 +349,7 @@ public class Main {
         for(int i=0; i<variables.length; i++){
             varMap.put(variables[i], i);
         }
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
         return tm;        
     }
     
@@ -370,7 +370,7 @@ public class Main {
         edges.add(edgesFrom3);
         
         MaxPlusInteger d1 = new MaxPlusInteger(1);
-        MaxPlusInteger[][] mu = {{d1}};
+        Tag[][] mu = {{d1}};
         
         Var[] l1 = {new BoolVar(true)};
         Var[] l2 = {new BoolVar(false)};
@@ -412,17 +412,36 @@ public class Main {
         System.out.println("random run");
         tm3.simulate(20, true, true);
         
-        /*
+        
+        ArrayList<Morphism> mm = new ArrayList<>();        
+        Morphism m = new Morphism() {
+            @Override
+            public Tag map(Tag tag) throws Exception {
+                if(tag.isEpsilon())
+                    return getTagInstance().getEpsilon();
+                else
+                    return new MaxPlusFloat(((float)0.0011810) * ((MaxPlusInteger) tag).getTag());
+            }
+
+            @Override
+            public Tag getTagInstance() {
+                return new MaxPlusFloat();
+            }
+        };
+        mm.add(m);
+        mm.add(null);
+        mm.add(null);
+        
         TagMachineSet tmSet = new TagMachineSet();
+        tmSet.add(tm2);        
         tmSet.add(tm1);
-        tmSet.add(tm2);
         tmSet.add(tm3);
-        TagMachine tmComp = tmSet.compose();
+        TagMachine tmComp = tmSet.compose(mm);
         System.out.println("TMcomposition --------------------------------------");
         System.out.println(tmComp);
         System.out.println("random run of tmComp");
         tmComp.simulate(20, true, true);
-        */
+        
     }
     
     public static void main(String[] args) throws Exception {

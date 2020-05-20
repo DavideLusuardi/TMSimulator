@@ -34,7 +34,7 @@ public class IntMorphism extends Morphism {
         
         if(tag.isEpsilon())
             return getTagInstance().getEpsilon();
-        else        
+        else
             return new MaxPlusInteger(alpha*((MaxPlusInteger)tag).getTag());
     }
     

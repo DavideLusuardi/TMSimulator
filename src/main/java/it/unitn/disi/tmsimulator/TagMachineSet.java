@@ -142,8 +142,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         else if(tagMorphismList.size() != this.size())
             throw new Exception("la lunghezza della lista dei tagMorphism deve corrispondere a quella di TagMachineSet");
         
-        TagMachine tmComp = this.get(0);
-        tmComp.applyMorphism(tagMorphismList.get(0));
+        this.get(0).applyMorphism(tagMorphismList.get(0));        
+        TagMachine tmComp = this.get(0); // TODO
         for(int i=1; i<this.size(); i++){
             this.get(i).applyMorphism(tagMorphismList.get(i));
             tmComp = compose(tmComp, this.get(i));

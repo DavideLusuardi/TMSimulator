@@ -87,6 +87,24 @@ public class TagMachine {
         }
     }
     
+    /*
+    public TagMachine applyMorphism(Morphism tagMorphism) throws Exception {
+        if(tagMorphism == null)
+            return this;
+        
+        ArrayList<ArrayList<Edge>> edgesM = new ArrayList<>(this.edges.size());
+        for(ArrayList<Edge> edgeList : this.edges){
+            ArrayList<Edge> edgeListM = new ArrayList<>(edgeList.size());
+            edges.add(edgeListM);
+            for(Edge e : edgeList){
+                edgeListM.add(e.getTagPiece().applyMorphism(tagMorphism));
+            }
+        }
+        
+        return new TagMachine(this.varMap, edgesM, this.initialState, this.acceptingStates, this.initialVarValues, tagMorphism.getTagInstance());
+    }
+    */
+    
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
         Tag[] tagVector = new Tag[varMap.size()];
         for(int i=0; i<tagVector.length; i++){
