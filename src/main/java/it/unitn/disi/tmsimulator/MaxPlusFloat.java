@@ -70,7 +70,8 @@ public final class MaxPlusFloat extends Tag {
         if(other == null || !(other instanceof MaxPlusFloat))
             return false;
         
-        return this.tag.equals(((MaxPlusFloat)other).getTag());
+        // return this.tag.equals(((MaxPlusFloat)other).getTag());
+        return Math.abs(this.tag - ((MaxPlusFloat)other).getTag()) < 0.0001; // TODO: decidere margine di errore
     }
 
     @Override

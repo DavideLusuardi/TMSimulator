@@ -5,6 +5,12 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -128,7 +134,7 @@ public class TagMachine {
             tagVector = tagPiece.apply(tagVector);
             
             if(debug){
-                System.out.println(String.format("%d -> %d", edges.get(state).get(nextStateIndex).getFromState(), 
+                System.out.println(String.format("\n%d -> %d", edges.get(state).get(nextStateIndex).getFromState(), 
                         edges.get(state).get(nextStateIndex).getToState()));
                 for(Map.Entry<String, Integer> entry : varMap.entrySet()){
                     String var = entry.getKey();
@@ -173,5 +179,14 @@ public class TagMachine {
         
         return sb.toString();
     }
+    
+    /*
+    public static TagMachine parseJSON(String filename) throws FileNotFoundException {
+        // Gson gson = new Gson();
+        // JsonReader reader = new JsonReader(new FileReader(filename));
+        JsonParser parser = new JsonParser();
+        JsonObject rootObj = parser.parse(json).getAsJsonObject();
+    }
+    */
     
 }

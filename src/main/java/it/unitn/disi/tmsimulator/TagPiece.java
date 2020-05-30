@@ -14,9 +14,9 @@ import java.util.Map;
  * @author davide
  */
 public class TagPiece {
-    final private Tag[][] matrix;
-    final private LabelingFunction[] labelingFunction;
-    final private Integer[] domLabelingFunction;
+    private Tag[][] matrix;
+    private LabelingFunction[] labelingFunction;
+    private Integer[] domLabelingFunction;
 
     // TODO: controllare che tag cambia quando var appartiene a Dom(v)
     public TagPiece(Tag[][] matrix, LabelingFunction[] labelingFunction) throws Exception {
@@ -115,6 +115,7 @@ public class TagPiece {
                 m[i][j] = tagMorphism.map(this.matrix[i][j]);
             }
         }
+        this.matrix = m;
     }
     
     public static boolean unifiable(TagPiece tp1, TagPiece tp2, 

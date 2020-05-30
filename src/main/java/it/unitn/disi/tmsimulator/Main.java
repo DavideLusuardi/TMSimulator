@@ -332,7 +332,7 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         edges.add(edgesFrom0);
         
-        MaxPlusFloat d1 = new MaxPlusFloat((float)1.0);
+        MaxPlusFloat d1 = new MaxPlusFloat((float)0.0011810); // TODO: 0.0011810 ??
         Tag[][] mu = {{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1}};
         
         Var[] l1 = {new BoolVar(true), new BoolVar(true), new IntVar(0), new FloatVar(0)};
@@ -370,7 +370,7 @@ public class Main {
         edges.add(edgesFrom3);
         
         MaxPlusInteger d1 = new MaxPlusInteger(1);
-        Tag[][] mu = {{d1}};
+        Tag[][] mu = {{d1}}; // TODO: la matrice mu è l'unica cosa riutilizzabile
         
         Var[] l1 = {new BoolVar(true)};
         Var[] l2 = {new BoolVar(false)};
@@ -394,23 +394,23 @@ public class Main {
     }
     
     public void runExampleEtherogeneous() throws Exception {
-        TagMachine tm1 = generateControlTM();
+        TagMachine tmControl = generateControlTM();
         System.out.println("Control TM -----------------------------------------");
-        System.out.println(tm1);
-        System.out.println("random run");
-        tm1.simulate(20, true, true);
+        System.out.println(tmControl);
+        //System.out.println("random run");
+        //tm1.simulate(20, true, true);
         
-        TagMachine tm2 = generatePiston1TM();
+        TagMachine tmPiston1 = generatePiston1TM();
         System.out.println("Piston1 TM -----------------------------------------");
-        System.out.println(tm2);
-        System.out.println("random run");
-        tm2.simulate(20, true, true);
+        System.out.println(tmPiston1);
+        //System.out.println("random run");
+        //tm2.simulate(20, true, true);
         
-        TagMachine tm3 = generateTorqueTM();
+        TagMachine tmTorque = generateTorqueTM();
         System.out.println("Torque TM ------------------------------------------");
-        System.out.println(tm3);
-        System.out.println("random run");
-        tm3.simulate(20, true, true);
+        System.out.println(tmTorque);
+        //System.out.println("random run");
+        //tm3.simulate(20, true, true);
         
         
         ArrayList<Morphism> mm = new ArrayList<>();        
@@ -427,20 +427,20 @@ public class Main {
             public Tag getTagInstance() {
                 return new MaxPlusFloat();
             }
-        };
+        };        
+        mm.add(null);
+        mm.add(null);
         mm.add(m);
-        mm.add(null);
-        mm.add(null);
         
         TagMachineSet tmSet = new TagMachineSet();
-        tmSet.add(tm2);        
-        tmSet.add(tm1);
-        tmSet.add(tm3);
+        tmSet.add(tmTorque);        
+        tmSet.add(tmControl);
+        tmSet.add(tmPiston1);
         TagMachine tmComp = tmSet.compose(mm);
         System.out.println("TMcomposition --------------------------------------");
         System.out.println(tmComp);
         System.out.println("random run of tmComp");
-        tmComp.simulate(20, true, true);
+        tmComp.simulate(10, true, true);
         
     }
     
