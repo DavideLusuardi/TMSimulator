@@ -120,9 +120,13 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         for(int i=0; i<acceptingStates.size(); i++)
             accStates[i] = acceptingStates.get(i); // TODO
         
+        // assegnazione valore variabili iniziali
         Var[] initialVarValues = new Var[varMap.size()];
-        for(int i=0; i<initialVarValues.length; i++){
-            initialVarValues[i] = tm1.getInitialVarValues()[0]; // TODO
+        for (Map.Entry<String, Integer> entry : tm1.getVarMap().entrySet()) {
+            initialVarValues[varMap.get(entry.getKey())] = tm1.getInitialVarValues()[entry.getValue()];
+        }
+        for (Map.Entry<String, Integer> entry : tm2.getVarMap().entrySet()) {
+            initialVarValues[varMap.get(entry.getKey())] = tm2.getInitialVarValues()[entry.getValue()];
         }
         
         TagMachine tmComp = new TagMachine(varMap, edges, initialState, accStates, initialVarValues, tm1.getTagInstance());

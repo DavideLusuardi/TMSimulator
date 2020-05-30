@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -112,43 +113,65 @@ public class TagMachine {
     */
     
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
-        Tag[] tagVector = new Tag[varMap.size()];
-        for(int i=0; i<tagVector.length; i++){
+        Scanner scan = new Scanner(System.in);
+        
+        Tag[] tagVector = new Tag[varMap.size()];        
+        for(int i=0; i<varMap.size(); i++){
             tagVector[i] = tagInstance.getIdentity();
         }
         
+        HashMap<String, Var> varValues = new HashMap<>(this.initialVarValues.length);
+        for(Map.Entry<String, Integer> entry : this.varMap.entrySet()){
+            varValues.put(entry.getKey(), this.initialVarValues[entry.getValue()]);
+        }
+        
+        /*
         ArrayList<ArrayList<Tag>> behaviorsTag = new ArrayList<>(varMap.size());
         ArrayList<ArrayList<Var>> behaviorsVarValue = new ArrayList<>(varMap.size());
         for(int i=0; i < varMap.size(); i++){
             behaviorsTag.add(new ArrayList<>());
             behaviorsVarValue.add(new ArrayList<>());
         }
+        */
         
         int state=initialState;
-        for(int i=0; i<steps; i++){
-            int nextStateIndex = 0;
-            if(random)
-                nextStateIndex = ThreadLocalRandom.current().nextInt(edges.get(state).size()); // TODO: gestire quando c'è un solo stato
+        for(int i=0; i<steps && edges.get(state).size()>0; i++){
+            int nextStateIndex = -1;                        
+            if(random) {
+                nextStateIndex = ThreadLocalRandom.current().nextInt(edges.get(state).size()); // TODO: gestire quando c'è un solo stato o nessuno
+            } else {
+                while(nextStateIndex < 0 || nextStateIndex >= edges.get(state).size()){
+                    System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, edges.get(state).size()-1));
+                    //nextStateIndex = scan.nextInt();
+                    nextStateIndex = 1;
+                }
+            }
             
             TagPiece tagPiece = edges.get(state).get(nextStateIndex).getTagPiece();
-            tagVector = tagPiece.apply(tagVector);
+            tagVector = tagPiece.apply(tagVector); // update tagVector
+            varValues = tagPiece.labelingFunction(varValues); // update varValues // TODO: controllare che la funzione restituisca il risultato corretto
             
             if(debug){
                 System.out.println(String.format("\n%d -> %d", edges.get(state).get(nextStateIndex).getFromState(), 
                         edges.get(state).get(nextStateIndex).getToState()));
+                System.out.println("<var> : <tag> , <value>");
                 for(Map.Entry<String, Integer> entry : varMap.entrySet()){
                     String var = entry.getKey();
                     Integer j = entry.getValue();
-                    System.out.print(var+": ");
-                    System.out.println(tagVector[j].toString());
+                    System.out.println(String.format("%s : %s , %s", var, tagVector[j].toString(), varValues.get(var).toString()));
                 }
+                System.out.println("");
+                
+                
             }
             
+            /*
             Integer[] updatedVarIndexes = tagPiece.domLabelingFunction();
             for(int varIndex : updatedVarIndexes){
                 behaviorsTag.get(varIndex).add(tagVector[varIndex]);
                 // behaviorsVarValue.get(varIndex).add(tagPiece.labelingFunction(varIndex)); // TODO
             }
+            */
             
             state = edges.get(state).get(nextStateIndex).getToState();
             

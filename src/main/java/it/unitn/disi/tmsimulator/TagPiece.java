@@ -17,19 +17,61 @@ public class TagPiece {
     private Tag[][] matrix;
     private LabelingFunction[] labelingFunction;
     private Integer[] domLabelingFunction;
+    private HashMap<String, Integer> varMap;
 
     // TODO: controllare che tag cambia quando var appartiene a Dom(v)
-    public TagPiece(Tag[][] matrix, LabelingFunction[] labelingFunction) throws Exception {
-        if(matrix.length == 0 || matrix.length != matrix[0].length){
-            throw new Exception("la matrice TagPiece deve essere quadrata");
-        }        
-        this.matrix = matrix;
-        
+    public TagPiece(Tag[][] matrix, LabelingFunction[] labelingFunction, HashMap<String, Integer> varMap) throws Exception {
+        setMatrix(matrix);
         if(labelingFunction.length != matrix.length){
             throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
         }
+
         this.labelingFunction = labelingFunction;
+        setDomLabelingFunction(labelingFunction);
         
+        this.varMap = varMap;
+    }
+    
+    public TagPiece(Tag[][] matrix, Var[] constLabelingFunction, HashMap<String, Integer> varMap) throws Exception {
+        setMatrix(matrix);
+        
+        if(constLabelingFunction.length != matrix.length){
+            throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
+        }
+        
+        setLabelingFunction(constLabelingFunction);
+        setDomLabelingFunction(labelingFunction);
+        this.varMap = varMap;
+    }
+    
+    public TagPiece(Tag[][] matrix, Var[] constLabelingFunction, String[] varNames) throws Exception {
+        setMatrix(matrix);
+        
+        if(constLabelingFunction.length != matrix.length){
+            throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
+        }
+        
+        setLabelingFunction(constLabelingFunction);
+        setDomLabelingFunction(labelingFunction);
+        
+        if(varNames.length != matrix.length || varNames.length != constLabelingFunction.length){
+            throw new Exception("il vettore varNames ha lunghezza incompatibile");
+        }
+        
+        this.varMap = new HashMap<>(varNames.length);
+        for(int i=0; i<varNames.length; i++){
+            this.varMap.put(varNames[i], i);
+        }
+    }
+
+    private void setMatrix(Tag[][] matrix) throws Exception {
+        if(matrix.length == 0 || matrix.length != matrix[0].length){
+            throw new Exception("la matrice TagPiece deve essere quadrata");
+        }
+        this.matrix = matrix;
+    }
+
+    private void setDomLabelingFunction(LabelingFunction[] labelingFunction) {
         ArrayList<Integer> indexes = new ArrayList<>();
         for(int i=0; i<labelingFunction.length; i++){
             if(labelingFunction[i] != null)
@@ -37,38 +79,32 @@ public class TagPiece {
         }
         this.domLabelingFunction = indexes.toArray(new Integer[0]);
     }
-    
-    public TagPiece(Tag[][] matrix, Var[] labelingFunction) throws Exception {
-        if(matrix.length == 0 || matrix.length != matrix[0].length){
-            throw new Exception("la matrice TagPiece deve essere quadrata");
-        }        
-        this.matrix = matrix;
-        
-        if(labelingFunction.length != matrix.length){
-            throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
-        }
-        
-        this.labelingFunction = new LabelingFunction[labelingFunction.length];
-        for(int i=0; i<labelingFunction.length; i++){
-            final Var v = labelingFunction[i];
+
+    private void setLabelingFunction(Var[] constLabelingFunction) {
+        this.labelingFunction = new LabelingFunction[constLabelingFunction.length];
+        for(int i=0; i<constLabelingFunction.length; i++){
+            final Var v = constLabelingFunction[i];
             this.labelingFunction[i] = new LabelingFunction() {
                 @Override
-                public Var apply(Var[] varValues) {
+                public Var apply(HashMap<String, Var> varValues) {
                     return v;
                 }
             };
         }
-        
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for(int i=0; i<labelingFunction.length; i++){
-            if(labelingFunction[i] != null)
-                indexes.add(i);
-        }
-        this.domLabelingFunction = indexes.toArray(new Integer[0]);
     }
+    
 
-    public Var labelingFunction(int varIndex, Var[] varVector) {
-        return labelingFunction[varIndex].apply(varVector);
+    public Var labelingFunction(String varName, HashMap<String, Var> varVector) {
+        return labelingFunction[this.varMap.get(varName)].apply(varVector);
+    }
+    
+    // crea un nuovo varVector con i valori delle variabili calcolati basandosi su quello vecchio
+    public HashMap<String, Var> labelingFunction(HashMap<String, Var> varVector) {
+        HashMap<String, Var> varVectorPrime = new HashMap<>(varVector);
+        for(Map.Entry<String, Var> varValue : varVector.entrySet()){
+            varVectorPrime.put(varValue.getKey(), labelingFunction(varValue.getKey(), varVector));
+        }
+        return varVectorPrime;
     }
     
     public Tag[] apply(Tag[] tagVector) throws Exception {
@@ -174,7 +210,7 @@ public class TagPiece {
             }
         }        
         
-        TagPiece tpComp = new TagPiece(matrix, labelingFunction);
+        TagPiece tpComp = new TagPiece(matrix, labelingFunction, varMapComp);
         return tpComp;
     }
 

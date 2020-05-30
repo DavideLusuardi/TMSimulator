@@ -40,6 +40,11 @@ public class Main {
     
     public TagMachine generateTm1() throws Exception {
         String[] variables = {"x", "y"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {1};
         Var[] initialVarValues = {new IntVar(0), new IntVar(0)};
@@ -48,25 +53,26 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         ArrayList<Edge> edgesFrom1 = new ArrayList<>();
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(m1ee1, l1ee1)));
-        edgesFrom0.add(new Edge(0, 1, new TagPiece(m1111, l1111)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(m1ee1, l1ee1, varMap)));
+        edgesFrom0.add(new Edge(0, 1, new TagPiece(m1111, l1111, varMap)));
 
-        edgesFrom1.add(new Edge(1, 1, new TagPiece(m1ee1, l1ee1)));
-        edgesFrom1.add(new Edge(1, 0, new TagPiece(m01e1, l01e1)));        
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(m1ee1, l1ee1, varMap)));
+        edgesFrom1.add(new Edge(1, 0, new TagPiece(m01e1, l01e1, varMap)));        
         
         edges.add(edgesFrom0);
         edges.add(edgesFrom1);
-        
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
+                
         TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
         return tm;        
     }
     
     public TagMachine generateTm2() throws Exception {
         String[] variables = {"x", "z"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {1};
         Var[] initialVarValues = {new IntVar(0), new IntVar(0)};
@@ -79,25 +85,26 @@ public class Main {
         edges.add(edgesFrom1);
         edges.add(edgesFrom2);
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom0.add(new Edge(0, 2, new TagPiece(m01e1, l01e1)));        
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom0.add(new Edge(0, 2, new TagPiece(m01e1, l01e1, varMap)));        
         
-        edgesFrom1.add(new Edge(1, 1, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom1.add(new Edge(1, 2, new TagPiece(m01e1, l01e1)));        
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(m01e1, l01e1, varMap)));        
         
-        edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom2.add(new Edge(2, 1, new TagPiece(m1111, l1111)));        
-        
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
+        edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom2.add(new Edge(2, 1, new TagPiece(m1111, l1111, varMap)));        
+                
         TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
         return tm;        
     }
     
     public TagMachine generateTm3() throws Exception {
         String[] variables = {"x", "y"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {1};
         Var[] initialVarValues = {new IntVar(0), new IntVar(0)};
@@ -110,25 +117,26 @@ public class Main {
         edges.add(edgesFrom1);
         edges.add(edgesFrom2);
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom0.add(new Edge(0, 2, new TagPiece(m1ee1, l1ee1)));        
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom0.add(new Edge(0, 2, new TagPiece(m1ee1, l1ee1, varMap)));        
         
-        edgesFrom1.add(new Edge(1, 1, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom1.add(new Edge(1, 2, new TagPiece(m0ee1, l0ee1)));        
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(m0ee1, l0ee1, varMap)));        
         
-        edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom2.add(new Edge(2, 1, new TagPiece(m2ee1, l2ee1)));        
+        edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom2.add(new Edge(2, 1, new TagPiece(m2ee1, l2ee1, varMap)));        
         
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
         TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
         return tm;        
     }
     
     public TagMachine generateTm4() throws Exception {
         String[] variables = {"x", "z"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {1};
         Var[] initialVarValues = {new IntVar(0), new IntVar(0)};
@@ -141,19 +149,15 @@ public class Main {
         edges.add(edgesFrom1);
         edges.add(edgesFrom2);
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom0.add(new Edge(0, 2, new TagPiece(m0ee1, l0ee1)));        
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom0.add(new Edge(0, 2, new TagPiece(m0ee1, l0ee1, varMap)));        
         
-        edgesFrom1.add(new Edge(1, 1, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom1.add(new Edge(1, 2, new TagPiece(m0ee1, l0ee1)));        
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(m0ee1, l0ee1, varMap)));        
         
-        edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0)));
-        edgesFrom2.add(new Edge(2, 1, new TagPiece(m2ee1, l2ee1)));        
+        edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0, varMap)));
+        edgesFrom2.add(new Edge(2, 1, new TagPiece(m2ee1, l2ee1, varMap)));        
         
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
         TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
         return tm;        
     }
@@ -232,7 +236,13 @@ public class Main {
         float c12  = (float) 0.0379945;
         float c13  = (float) -0.0025700; 
                 
+        //                     0       1       2       3      4       5       6      7        8        9       10
         String[] variables = {"x11", "x21", "sm11", "sm21", "sm31", "fai", "pfai", "rot", "cutoff", "torque", "aw"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {0};
         Var[] initialVarValues = {new FloatVar(36), new FloatVar(1), new FloatVar((float)-4.4857183), 
@@ -246,43 +256,42 @@ public class Main {
         MaxPlusFloat d1 = new MaxPlusFloat(d);
         Tag[][] mu = {{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1}};
         
-        float z = (float)0;
-        Float p1[] = {1+d*a11, d*a12, z, z, z, z, z, z, z, d*b11, z}; // x11 + d*(a11*x11 + a12*x21 + b11*torque)
-        Float p2[] = {d*a21, 1+d*a22, z, z, z, z, z, z, z, d*b21, z}; // x21 + d*(a21*x11 + a22*x21 + b21*torque)
-        Float p3[] = {z, z, 1+d*ap11, d*ap12, d*ap13, z, z, z, z, bp11, z}; // sm11 + d*(ap11*sm11 + ap12*sm21 + ap13*sm31) + bp11*torque
-        Float p4[] = {z, z, d*ap21, 1+d*ap22, d*ap23, z, z, z, z, bp21, z}; // sm21 + d*(ap21*sm11 + ap22*sm21 + ap23*sm31) + bp21*torque
-        Float p5[] = {z, z, d*ap31, d*ap32, 1+d*ap33, z, z, z, z, bp31, z}; // sm31 + d*(ap31*sm11 + ap32*sm21 + ap33*sm31) + bp31*torque
-        Float p6[] = {z, z, z, d/60, z, (float)1, z, z, z, z, z}; // fai + d*sm21/60
-        Float p10[] = {z, z, z, z, z, z, z, z, z, z, z}; // 0
-        Float p11[] = {c12, c13, z, z, z, z, z, z, z, z, z}; // c12*x11+c13*x21
+        Float p1[] = {1+d*a11, d*a12, null, null, null, null, null, null, null, d*b11, null}; // x11 + d*(a11*x11 + a12*x21 + b11*torque)
+        Float p2[] = {d*a21, 1+d*a22, null, null, null, null, null, null, null, d*b21, null}; // x21 + d*(a21*x11 + a22*x21 + b21*torque)
+        Float p3[] = {null, null, 1+d*ap11, d*ap12, d*ap13, null, null, null, null, bp11, null}; // sm11 + d*(ap11*sm11 + ap12*sm21 + ap13*sm31) + bp11*torque
+        Float p4[] = {null, null, d*ap21, 1+d*ap22, d*ap23, null, null, null, null, bp21, null}; // sm21 + d*(ap21*sm11 + ap22*sm21 + ap23*sm31) + bp21*torque
+        Float p5[] = {null, null, d*ap31, d*ap32, 1+d*ap33, null, null, null, null, bp31, null}; // sm31 + d*(ap31*sm11 + ap32*sm21 + ap33*sm31) + bp31*torque
+        Float p6[] = {null, null, null, d/60, null, (float)1, null, null, null, null, null}; // fai + d*sm21/60
+        Float p10[] = {null, null, null, null, null, null, null, null, null, null, null}; // 0
+        Float p11[] = {c12, c13, null, null, null, null, null, null, null, null, null}; // c12*x11+c13*x21
         
-        LabelingFunction lf1 = new FloatLinearLabelingFunction(p1);
-        LabelingFunction lf2 = new FloatLinearLabelingFunction(p2);
-        LabelingFunction lf3 = new FloatLinearLabelingFunction(p3);
-        LabelingFunction lf4 = new FloatLinearLabelingFunction(p4);
-        LabelingFunction lf5 = new FloatLinearLabelingFunction(p5);
-        LabelingFunction lf6 = new FloatLinearLabelingFunction(p6);
-        LabelingFunction lf10 = new FloatLinearLabelingFunction(p10);
-        LabelingFunction lf11 = new FloatLinearLabelingFunction(p11);
+        LabelingFunction lf1 = new FloatLinearLabelingFunction(variables, p1);
+        LabelingFunction lf2 = new FloatLinearLabelingFunction(variables, p2);
+        LabelingFunction lf3 = new FloatLinearLabelingFunction(variables, p3);
+        LabelingFunction lf4 = new FloatLinearLabelingFunction(variables, p4);
+        LabelingFunction lf5 = new FloatLinearLabelingFunction(variables, p5);
+        LabelingFunction lf6 = new FloatLinearLabelingFunction(variables, p6);
+        LabelingFunction lf10 = new FloatLinearLabelingFunction(variables, p10);
+        LabelingFunction lf11 = new FloatLinearLabelingFunction(variables, p11);
         
         LabelingFunction lf7 = new LabelingFunction() {
             // ((fai-pfai>=i1) && (fai-pfai<=i2))*fai + (1-((fai-pfai>=i1) && (fai-pfai<=i2)))*pfai
             @Override
-            public Var apply(Var[] varValues) {
-                Float value = ((Float)varValues[6].getValue());
-                Float fai_pfai = ((Float)varValues[5].getValue())-((Float)varValues[6].getValue());
+            public Var apply(HashMap<String, Var> varValues) {
+                Float value = ((Float)varValues.get("pfai").getValue());
+                Float fai_pfai = ((Float)varValues.get("fai").getValue())-((Float)varValues.get("pfai").getValue());
                 if(fai_pfai >= i1 && fai_pfai <= i2){
-                    value = ((Float)varValues[5].getValue());
+                    value = ((Float)varValues.get("fai").getValue());
                 }
-                return varValues[0].newInstance(value);
+                return varValues.get("pfai").newInstance(value);
             }
         };
         
         LabelingFunction lf8 = new LabelingFunction() {
             // (fai-pfai>=i1) && (fai-pfai<=i2)
             @Override
-            public Var apply(Var[] varValues) {
-                Float fai_pfai = ((Float)varValues[5].getValue())-((Float)varValues[6].getValue());
+            public Var apply(HashMap<String, Var> varValues) {
+                Float fai_pfai = ((Float)varValues.get("fai").getValue())-((Float)varValues.get("pfai").getValue());
                 if(fai_pfai >= i1 && fai_pfai <= i2){
                     return new BoolVar(Boolean.TRUE);
                 }
@@ -293,29 +302,25 @@ public class Main {
         LabelingFunction lf9 = new LabelingFunction() {
             // cutoff || (v11*x11+v12*x21>=0)
             @Override
-            public Var apply(Var[] varValues) {
-                Float res = v11*((Float)varValues[0].getValue()) + v12*((Float)varValues[1].getValue());
-                if((Boolean)varValues[8].getValue() || res >= 0){
+            public Var apply(HashMap<String, Var> varValues) {
+                Float res = v11*((Float)varValues.get("x11").getValue()) + v12*((Float)varValues.get("x21").getValue());
+                if((Boolean)varValues.get("cutoff").getValue() || res >= 0){
                     return new BoolVar(Boolean.TRUE);
                 }
                 return new BoolVar(Boolean.FALSE);
             }
         };
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10, lf11})));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10, lf11}, varMap)));
         
         LabelingFunction lf10p = new LabelingFunction() {
             @Override
-            public Var apply(Var[] varValues) {
+            public Var apply(HashMap<String, Var> varValues) {
                 return new FloatVar(M);
             }
         };
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10p, lf11})));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10p, lf11}, varMap)));
         
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
         TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
         return tm;        
     }
@@ -340,10 +345,10 @@ public class Main {
         Var[] l3 = {new BoolVar(false), new BoolVar(true), null, new FloatVar(0)};
         Var[] l4 = {new BoolVar(false), new BoolVar(false), null, new FloatVar(M)};
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l4)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, variables)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, variables)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3, variables)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l4, variables)));
         
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
         for(int i=0; i<variables.length; i++){
@@ -370,20 +375,20 @@ public class Main {
         edges.add(edgesFrom3);
         
         MaxPlusInteger d1 = new MaxPlusInteger(1);
-        Tag[][] mu = {{d1}}; // TODO: la matrice mu è l'unica cosa riutilizzabile
+        Tag[][] mu = {{d1}}; // NB: la matrice mu è l'unica cosa riutilizzabile
         
         Var[] l1 = {new BoolVar(true)};
         Var[] l2 = {new BoolVar(false)};
         
-        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu, l1)));
-        edgesFrom1.add(new Edge(1, 2, new TagPiece(mu, l1)));
-        edgesFrom2.add(new Edge(2, 3, new TagPiece(mu, l1)));
-        edgesFrom3.add(new Edge(3, 0, new TagPiece(mu, l1)));
+        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu, l1, variables)));
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(mu, l1, variables)));
+        edgesFrom2.add(new Edge(2, 3, new TagPiece(mu, l1, variables)));
+        edgesFrom3.add(new Edge(3, 0, new TagPiece(mu, l1, variables)));
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2)));
-        edgesFrom1.add(new Edge(1, 1, new TagPiece(mu, l2)));
-        edgesFrom2.add(new Edge(2, 2, new TagPiece(mu, l2)));
-        edgesFrom3.add(new Edge(3, 3, new TagPiece(mu, l2)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, variables)));
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(mu, l2, variables)));
+        edgesFrom2.add(new Edge(2, 2, new TagPiece(mu, l2, variables)));
+        edgesFrom3.add(new Edge(3, 3, new TagPiece(mu, l2, variables)));
         
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
         for(int i=0; i<variables.length; i++){
@@ -439,8 +444,8 @@ public class Main {
         TagMachine tmComp = tmSet.compose(mm);
         System.out.println("TMcomposition --------------------------------------");
         System.out.println(tmComp);
-        System.out.println("random run of tmComp");
-        tmComp.simulate(10, true, true);
+        System.out.println("run of tmComp");
+        tmComp.simulate(10, false, true);
         
     }
     

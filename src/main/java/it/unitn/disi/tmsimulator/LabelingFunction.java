@@ -5,10 +5,12 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import java.util.HashMap;
+
 /**
  *
  * @author davide
  */
 public abstract class LabelingFunction {
-    public abstract Var apply(Var varValues[]);
+    public abstract Var apply(HashMap<String, Var> varValues);
 }
