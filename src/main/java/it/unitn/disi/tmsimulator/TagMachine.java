@@ -11,6 +11,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,6 +115,9 @@ public class TagMachine {
     
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
         Scanner scan = new Scanner(System.in);
+        FileWriter xFile = new FileWriter("x_paper.txt");
+        FileWriter awFile = new FileWriter("aw_paper.txt");
+        FileWriter jFile = new FileWriter("j_paper.txt");
         
         Tag[] tagVector = new Tag[varMap.size()];        
         for(int i=0; i<varMap.size(); i++){
@@ -163,6 +167,10 @@ public class TagMachine {
                 System.out.println("");
                 
                 
+                xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
+                awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
+                // jFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("j").toString()));
+                
             }
             
             /*
@@ -176,6 +184,10 @@ public class TagMachine {
             state = edges.get(state).get(nextStateIndex).getToState();
             
         }
+        
+        xFile.close();
+        awFile.close();
+        jFile.close();
         
     }
 

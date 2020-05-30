@@ -23,7 +23,7 @@ public class TagPiece {
     public TagPiece(Tag[][] matrix, LabelingFunction[] labelingFunction, HashMap<String, Integer> varMap) throws Exception {
         setMatrix(matrix);
         if(labelingFunction.length != matrix.length){
-            throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
+            throw new Exception("il vettore labelingFunction ha lunghezza incompatibile con la matrice TagPiece");
         }
 
         this.labelingFunction = labelingFunction;
@@ -36,7 +36,7 @@ public class TagPiece {
         setMatrix(matrix);
         
         if(constLabelingFunction.length != matrix.length){
-            throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
+            throw new Exception("il vettore constLabelingFunction ha lunghezza incompatibile con la matrice TagPiece");
         }
         
         setLabelingFunction(constLabelingFunction);
@@ -48,7 +48,7 @@ public class TagPiece {
         setMatrix(matrix);
         
         if(constLabelingFunction.length != matrix.length){
-            throw new Exception("il vettore varAssignment ha lunghezza incompatibile con la matrice TagPiece");
+            throw new Exception("il vettore constLabelingFunction ha lunghezza incompatibile con la matrice TagPiece");
         }
         
         setLabelingFunction(constLabelingFunction);
@@ -167,6 +167,8 @@ public class TagPiece {
                 Integer i2 = varMap2.get(w);
                 Integer j2 = varMap2.get(v);
                 
+                Tag t1 = m1[i1][j1];
+                Tag t2 = m2[i2][j2];
                 if(!m1[i1][j1].equals(m2[i2][j2]) /*|| !(tp1.labelingFunction(j1) == null && 
                         tp2.labelingFunction(j2) == null || tp1.labelingFunction(j1) != null && 
                         tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))*/ ){
