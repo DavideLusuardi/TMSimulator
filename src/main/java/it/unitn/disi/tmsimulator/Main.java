@@ -591,21 +591,14 @@ public class Main {
         TagMachine tmTorque = generateTorqueTMPaper();
         System.out.println("Torque TM ------------------------------------------");
         System.out.println(tmTorque);
-        //System.out.println("random run");
-        //tm3.simulate(20, true, true);
 
         TagMachine tmControl = generateControlTMPaper();
         System.out.println("Control TM -----------------------------------------");
         System.out.println(tmControl);
-        //System.out.println("random run");
-        //tm1.simulate(20, true, true);
         
         TagMachine tmPiston1 = generatePiston1TMPaper();
         System.out.println("Piston1 TM -----------------------------------------");
         System.out.println(tmPiston1);
-        //System.out.println("random run");
-        //tm2.simulate(20, true, true);
-        
         
         ArrayList<Morphism> mm = new ArrayList<>();        
         Morphism m = new Morphism() {
