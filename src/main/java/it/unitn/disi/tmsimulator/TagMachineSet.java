@@ -53,19 +53,21 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             int s2 = stateQueue2.get(sComp);
             for(Edge e1 : tm1.getEdges().get(s1)){
                 for(Edge e2 : tm2.getEdges().get(s2)){
-                    if(TagPiece.unifiable(e1.getTagPiece(), e2.getTagPiece(), 
+                    if(TagPiece.isUnifiable(e1.getTagPiece(), e2.getTagPiece(), 
                             tm1.getVarMap(), tm2.getVarMap(), sharedVars)){
 
-                        // System.out.println(String.format("unifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
+                        // System.out.println(String.format("isUnifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
 
                         TagPiece tp = TagPiece.union(e1.getTagPiece(), e2.getTagPiece(), 
                                 tm1.getVarMap(), tm2.getVarMap(), varMap, tm1.getTagInstance().getEpsilon()); // TODO
 
-                        if(compStateIndexes[e1.getToState()][e2.getToState()] == -1){ // lo stato (e1.getToState(), e2.getToState()) non esiste ancora
+                        if(compStateIndexes[e1.getToState()][e2.getToState()] == -1){ // lo stato (e1.getToState(), e2.getToState()) non esiste ancora                            
                             compStateIndexes[e1.getToState()][e2.getToState()] = edges.size(); // il nuovo stato assume indice pari a edges.size()
                             stateQueue1.add(e1.getToState());
                             stateQueue2.add(e2.getToState());
                             edges.add(new ArrayList<>()); // aggiungo il nuovo stato (inizialmente senza transizioni)
+                            
+                            // System.out.println(String.format("state assignment %d = (%d,%d)", edges.size()-1, e1.getToState(), e2.getToState()));
                         }
                         Edge e = new Edge(sComp, compStateIndexes[e1.getToState()][e2.getToState()], tp);
                         edges.get(sComp).add(e);
@@ -81,10 +83,10 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             for(Edge e1 : tm1.getEdges().get(i)){
                 for(int j=0; j<tm2.getEdges().size(); j++){
                     for(Edge e2 : tm2.getEdges().get(j)){
-                        if(TagPiece.unifiable(e1.getTagPiece(), e2.getTagPiece(), 
+                        if(TagPiece.isUnifiable(e1.getTagPiece(), e2.getTagPiece(), 
                                 tm1.getVarMap(), tm2.getVarMap(), sharedVars)){
                             
-                            System.out.println(String.format("unifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
+                            System.out.println(String.format("isUnifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
                             
                             TagPiece tp = TagPiece.union(e1.getTagPiece(), e2.getTagPiece(), 
                                     tm1.getVarMap(), tm2.getVarMap(), varMap, tm1.getTagInstance().getEpsilon()); // TODO
@@ -234,10 +236,10 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             int s2 = stateMap2.get(sComp);
             for(Edge e1 : tm1.getEdges().get(s1)){
                 for(Edge e2 : tm2.getEdges().get(s2)){
-                    if(TagPiece.unifiable(e1.getTagPiece(), e2.getTagPiece(), 
+                    if(TagPiece.isUnifiable(e1.getTagPiece(), e2.getTagPiece(), 
                             tm1.getVarMap(), tm2.getVarMap(), sharedVars)){
 
-                        System.out.println(String.format("unifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
+                        System.out.println(String.format("isUnifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
 
                         TagPiece tp = TagPiece.union(e1.getTagPiece(), e2.getTagPiece(), 
                                 tm1.getVarMap(), tm2.getVarMap(), varMap, tm1.getTagInstance().getEpsilon()); // TODO

@@ -83,13 +83,22 @@ public class TagPiece {
     private void setLabelingFunction(Var[] constLabelingFunction) {
         this.labelingFunction = new LabelingFunction[constLabelingFunction.length];
         for(int i=0; i<constLabelingFunction.length; i++){
-            final Var v = constLabelingFunction[i];
-            this.labelingFunction[i] = new LabelingFunction() {
-                @Override
-                public Var apply(HashMap<String, Var> varValues) {
-                    return v;
-                }
-            };
+            final Var v = constLabelingFunction[i]; // TODO: controllare che tutto funzioni correttamente quando v == null
+            
+            if(v == null)
+                this.labelingFunction[i] = null;
+            else
+                this.labelingFunction[i] = new LabelingFunction() {
+                    @Override
+                    public Var apply(HashMap<String, Var> varValues) {
+                        return v;
+                    }
+
+                    @Override
+                    public String toString() {
+                        return v.getValue().toString();
+                    }
+                };
         }
     }
     
@@ -134,6 +143,10 @@ public class TagPiece {
         return labelingFunction;
     }
     
+    public LabelingFunction getLabelingFunction(String varName) {
+        return labelingFunction[this.varMap.get(varName)];
+    }
+    
     public Integer[] domLabelingFunction(){
         return domLabelingFunction;
     }
@@ -154,7 +167,23 @@ public class TagPiece {
         this.matrix = m;
     }
     
-    public static boolean unifiable(TagPiece tp1, TagPiece tp2, 
+    public static boolean isLabelingFunctionUnifiable(TagPiece tp1, TagPiece tp2, ArrayList<String> sharedVars){
+        for(String varName : sharedVars){
+            LabelingFunction l1 = tp1.getLabelingFunction(varName);
+            LabelingFunction l2 = tp2.getLabelingFunction(varName);
+            
+            if(l1 == null){
+                if(l2 != null)
+                    return false;
+            } else if(!l1.equals(l2)){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // TODO: bisogna aggiungere il controllo che le labeling function siano uguali
+    public static boolean isUnifiable(TagPiece tp1, TagPiece tp2, 
             HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
             ArrayList<String> sharedVars){
         
@@ -169,7 +198,8 @@ public class TagPiece {
                 
                 Tag t1 = m1[i1][j1];
                 Tag t2 = m2[i2][j2];
-                if(!m1[i1][j1].equals(m2[i2][j2]) /*|| !(tp1.labelingFunction(j1) == null && 
+                if(!(m1[i1][j1].equals(m2[i2][j2]) && isLabelingFunctionUnifiable(tp1, tp2, sharedVars))
+                        /*|| !(tp1.labelingFunction(j1) == null && 
                         tp2.labelingFunction(j2) == null || tp1.labelingFunction(j1) != null && 
                         tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))*/ ){
                     return false;

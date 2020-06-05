@@ -13,4 +13,18 @@ import java.util.HashMap;
  */
 public abstract class LabelingFunction {
     public abstract Var apply(HashMap<String, Var> varValues);
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || !(obj instanceof LabelingFunction))
+            return false;
+        
+        LabelingFunction lf2 = (LabelingFunction) obj;
+
+        try {
+            return this.apply(null).equals(lf2.apply(null)); // TODO: sistemare il controllo
+        } catch(Exception e){
+            return true;
+        }
+    }
 }

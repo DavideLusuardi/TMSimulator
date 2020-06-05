@@ -530,15 +530,7 @@ public class Main {
                 }
                 return new BoolVar(Boolean.FALSE);
             }
-        };
-        
-        LabelingFunction lf10 = new LabelingFunction() {
-            @Override
-            public Var apply(HashMap<String, Var> varValues) {
-                return new FloatVar(0);
-            }
-        };
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10, lf11}, varMap)));
+        };                
         
         LabelingFunction lf10p = new LabelingFunction() {
             @Override
@@ -547,6 +539,14 @@ public class Main {
             }
         };
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10p, lf11}, varMap)));
+        
+        LabelingFunction lf10 = new LabelingFunction() {
+            @Override
+            public Var apply(HashMap<String, Var> varValues) {
+                return new FloatVar(0);
+            }
+        };
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10, lf11}, varMap)));
         
         TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
         return tm;        
@@ -565,14 +565,15 @@ public class Main {
         MaxPlusFloat d1 = new MaxPlusFloat(d);
         Tag[][] mu = {{d1,e,e},{e,d1,e},{e,e,d1}};
         
+        // labeling function diverse da quelle di Hoa Le
         Var[] l1 = {new BoolVar(false), new BoolVar(true), new FloatVar(0)};
         Var[] l2 = {new BoolVar(true), new BoolVar(false), new FloatVar(0)};
         Var[] l3 = {new BoolVar(false), new BoolVar(false), new FloatVar(M)};
         Var[] l4 = {new BoolVar(true), new BoolVar(true), new FloatVar(M)};
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, variables)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, variables)));
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3, variables)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, variables)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, variables)));        
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l4, variables)));
         
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
@@ -634,7 +635,7 @@ public class Main {
         System.out.println("TMcomposition --------------------------------------");
         System.out.println(tmComp);
         System.out.println("run of tmComp");
-        tmComp.simulate(2000, false, true);
+        tmComp.simulate(2000, false, false);
         
     }
     

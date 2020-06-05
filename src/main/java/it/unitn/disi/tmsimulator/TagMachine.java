@@ -145,9 +145,9 @@ public class TagMachine {
                 nextStateIndex = ThreadLocalRandom.current().nextInt(edges.get(state).size()); // TODO: gestire quando c'è un solo stato o nessuno
             } else {
                 while(nextStateIndex < 0 || nextStateIndex >= edges.get(state).size()){
-                    System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, edges.get(state).size()-1));
+                    //System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, edges.get(state).size()-1));
                     //nextStateIndex = scan.nextInt();
-                    nextStateIndex = 1;
+                    nextStateIndex = 0;
                 }
             }
             
@@ -165,13 +165,11 @@ public class TagMachine {
                     System.out.println(String.format("%s : %s , %s", var, tagVector[j].toString(), varValues.get(var).toString()));
                 }
                 System.out.println("");
-                
-                
-                xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
-                awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
-                // jFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("j").toString()));
-                
             }
+            xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
+            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
+            // jFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("j").toString()));
+
             
             /*
             Integer[] updatedVarIndexes = tagPiece.domLabelingFunction();
@@ -210,6 +208,24 @@ public class TagMachine {
                 sb.append(String.format("%d, ", e.getToState()));
             }
             sb.append("\n");
+        }
+        
+        for(ArrayList<Edge> edgeList : this.edges){
+            i=0;
+            for(Edge e : edgeList){
+                sb.append(String.format("\n%d: %d -> %d\n", i, e.getFromState(), e.getToState()));
+                i++;
+                
+                for(Map.Entry<String, Integer> entry : this.varMap.entrySet()){
+                    LabelingFunction l = e.getTagPiece().getLabelingFunction(entry.getKey());
+                    
+                    if(l != null)
+                        sb.append(String.format("%s = %s\n", entry.getKey(), l.toString()));
+                    else
+                        sb.append(String.format("%s = -\n", entry.getKey()));
+                }
+                
+            }
         }
         
         return sb.toString();
