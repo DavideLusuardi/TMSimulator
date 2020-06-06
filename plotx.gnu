@@ -1,5 +1,5 @@
 set term postscript font 15 enhanced color
-set output "x_confronto.eps" # chinh sua ten file output o day
+set output "x.eps" # chinh sua ten file output o day
 #set title "x2"
 set xlabel "x1"
 set ylabel "x2"

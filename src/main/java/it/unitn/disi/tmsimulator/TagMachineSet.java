@@ -77,37 +77,6 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             sComp++;
         }
         
-        /* 
-        // composizione andando a considerare tutte le combinazioni di transizioni
-        for(int i=0; i<tm1.getEdges().size(); i++){
-            for(Edge e1 : tm1.getEdges().get(i)){
-                for(int j=0; j<tm2.getEdges().size(); j++){
-                    for(Edge e2 : tm2.getEdges().get(j)){
-                        if(TagPiece.isUnifiable(e1.getTagPiece(), e2.getTagPiece(), 
-                                tm1.getVarMap(), tm2.getVarMap(), sharedVars)){
-                            
-                            System.out.println(String.format("isUnifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
-                            
-                            TagPiece tp = TagPiece.union(e1.getTagPiece(), e2.getTagPiece(), 
-                                    tm1.getVarMap(), tm2.getVarMap(), varMap, tm1.getTagInstance().getEpsilon()); // TODO
-                            
-                            if(compositionMatrix[i][j] == -1){
-                                compositionMatrix[i][j] = edges.size();
-                                edges.add(new ArrayList<>());
-                            }
-                            if(compositionMatrix[e1.getToState()][e2.getToState()] == -1){
-                                compositionMatrix[e1.getToState()][e2.getToState()] = edges.size();
-                                edges.add(new ArrayList<>());
-                            }
-                            Edge e = new Edge(compositionMatrix[i][j], compositionMatrix[e1.getToState()][e2.getToState()], tp);
-                            edges.get(compositionMatrix[i][j]).add(e);
-                        }
-                    }
-                }
-            }
-        }
-        */
-        
         int initialState = compStateIndexes[tm1.getInitialState()][tm2.getInitialState()];
         ArrayList<Integer> acceptingStates = new ArrayList<>();
         for(int i : tm1.getAcceptingStates()){

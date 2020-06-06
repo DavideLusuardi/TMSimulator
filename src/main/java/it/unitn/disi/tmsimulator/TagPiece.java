@@ -15,19 +15,33 @@ import java.util.Map;
  */
 public class TagPiece {
     private Tag[][] matrix;
-    private LabelingFunction[] labelingFunction;
-    private Integer[] domLabelingFunction;
+    
+    // TODO: decidere se labelingFunction può contenere null
+    private ArrayList<ArrayList<LabelingFunction>> labelingFunction; // TODO: implementare una struttura dati con complessità di concatenzaione costante
     private HashMap<String, Integer> varMap;
+    
+    public TagPiece(Tag[][] matrix, ArrayList<ArrayList<LabelingFunction>> labelingFunction, HashMap<String, Integer> varMap) throws Exception {
+        setMatrix(matrix);
+        if(labelingFunction.size() != matrix.length){
+            throw new Exception("il vettore labelingFunction ha lunghezza incompatibile con la matrice TagPiece");
+        }
 
-    // TODO: controllare che tag cambia quando var appartiene a Dom(v)
+        this.labelingFunction = labelingFunction;        
+        this.varMap = varMap;
+    }
+    
     public TagPiece(Tag[][] matrix, LabelingFunction[] labelingFunction, HashMap<String, Integer> varMap) throws Exception {
         setMatrix(matrix);
         if(labelingFunction.length != matrix.length){
             throw new Exception("il vettore labelingFunction ha lunghezza incompatibile con la matrice TagPiece");
         }
 
-        this.labelingFunction = labelingFunction;
-        setDomLabelingFunction(labelingFunction);
+        this.labelingFunction = new ArrayList<>(labelingFunction.length);
+        for(LabelingFunction lf : labelingFunction){
+            ArrayList<LabelingFunction> lflist = new ArrayList<>();
+            lflist.add(lf);
+            this.labelingFunction.add(lflist);
+        }
         
         this.varMap = varMap;
     }
@@ -40,7 +54,6 @@ public class TagPiece {
         }
         
         setLabelingFunction(constLabelingFunction);
-        setDomLabelingFunction(labelingFunction);
         this.varMap = varMap;
     }
     
@@ -52,7 +65,6 @@ public class TagPiece {
         }
         
         setLabelingFunction(constLabelingFunction);
-        setDomLabelingFunction(labelingFunction);
         
         if(varNames.length != matrix.length || varNames.length != constLabelingFunction.length){
             throw new Exception("il vettore varNames ha lunghezza incompatibile");
@@ -64,6 +76,10 @@ public class TagPiece {
         }
     }
 
+    public Tag[][] getMatrix() {
+        return matrix;
+    }
+    
     private void setMatrix(Tag[][] matrix) throws Exception {
         if(matrix.length == 0 || matrix.length != matrix[0].length){
             throw new Exception("la matrice TagPiece deve essere quadrata");
@@ -71,24 +87,15 @@ public class TagPiece {
         this.matrix = matrix;
     }
 
-    private void setDomLabelingFunction(LabelingFunction[] labelingFunction) {
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for(int i=0; i<labelingFunction.length; i++){
-            if(labelingFunction[i] != null)
-                indexes.add(i);
-        }
-        this.domLabelingFunction = indexes.toArray(new Integer[0]);
-    }
-
     private void setLabelingFunction(Var[] constLabelingFunction) {
-        this.labelingFunction = new LabelingFunction[constLabelingFunction.length];
-        for(int i=0; i<constLabelingFunction.length; i++){
-            final Var v = constLabelingFunction[i]; // TODO: controllare che tutto funzioni correttamente quando v == null
+        this.labelingFunction = new ArrayList<>(constLabelingFunction.length);
+        for(final Var v : constLabelingFunction){
+            ArrayList<LabelingFunction> lflist = new ArrayList<>();
             
             if(v == null)
-                this.labelingFunction[i] = null;
+                lflist.add(null); // TODO: controllare che tutto funzioni correttamente quando v == null
             else
-                this.labelingFunction[i] = new LabelingFunction() {
+                lflist.add(new LabelingFunction() {
                     @Override
                     public Var apply(HashMap<String, Var> varValues) {
                         return v;
@@ -98,16 +105,14 @@ public class TagPiece {
                     public String toString() {
                         return v.getValue().toString();
                     }
-                };
+                });
+            
+            this.labelingFunction.add(lflist);
         }
     }
     
-
-    public Var labelingFunction(String varName, HashMap<String, Var> varVector) {
-        return labelingFunction[this.varMap.get(varName)].apply(varVector);
-    }
-    
-    // crea un nuovo varVector con i valori delle variabili calcolati basandosi su quello vecchio
+    // crea una mappa varName : varValue applicando la labeling function a varVector
+    /*
     public HashMap<String, Var> labelingFunction(HashMap<String, Var> varVector) {
         HashMap<String, Var> varVectorPrime = new HashMap<>(varVector);
         for(Map.Entry<String, Var> varValue : varVector.entrySet()){
@@ -115,6 +120,7 @@ public class TagPiece {
         }
         return varVectorPrime;
     }
+    */
     
     public Tag[] apply(Tag[] tagVector) throws Exception {
         if(tagVector.length != this.matrix.length){
@@ -139,21 +145,52 @@ public class TagPiece {
         return tagVectorPrime;
     }
 
-    public LabelingFunction[] getLabelingFunction() {
+    public ArrayList<ArrayList<LabelingFunction>> getLabelingFunction() {
         return labelingFunction;
+    }
+    
+    public boolean isLabelingFunctionUnifiable(HashMap<String, Var> varValues){
+        for(ArrayList<LabelingFunction> lflist : this.labelingFunction){
+            LabelingFunction lf0 = lflist.get(0);
+            Var v0 = null;
+            if(lf0 != null)
+                v0 = lf0.apply(varValues); // TODO: assicurarsi ci sia almeno un elemento
+            
+            for(int i=1; i<lflist.size(); i++){
+                LabelingFunction lfi = lflist.get(i);
+                if(lf0 == null){
+                    if(lfi != null)
+                        return false;
+                } else if(!v0.equals(lfi.apply(varValues))){ // TODO: verificare v0 != null
+                    return false;
+                }                
+            }
+            
+        }
+        
+        return true;
+    }
+    
+    public HashMap<String, Var> applyLabelingFunction(HashMap<String, Var> varValues){
+        HashMap<String, Var> varValuesPrime = new HashMap<>(varValues);
+        
+        for(Map.Entry<String, Integer> entry : this.varMap.entrySet()){
+            Var v = this.labelingFunction.get(entry.getValue()).get(0).apply(varValues); // TODO: assicurarsi ci sia almeno un elemento
+            varValuesPrime.put(entry.getKey(), v);
+        }
+        
+        return varValuesPrime;
+    }
+    
+    /*
+    public Var labelingFunction(String varName, HashMap<String, Var> varVector) {
+        return labelingFunction[this.varMap.get(varName)].apply(varVector);
     }
     
     public LabelingFunction getLabelingFunction(String varName) {
         return labelingFunction[this.varMap.get(varName)];
     }
-    
-    public Integer[] domLabelingFunction(){
-        return domLabelingFunction;
-    }
-
-    public Tag[][] getMatrix() {
-        return matrix;
-    }
+    */
     
     // TODO: fix java.lang.ArrayStoreException
     public void applyMorphism(Morphism tagMorphism) throws Exception {
@@ -167,6 +204,7 @@ public class TagPiece {
         this.matrix = m;
     }
     
+    /*
     public static boolean isLabelingFunctionUnifiable(TagPiece tp1, TagPiece tp2, ArrayList<String> sharedVars){
         for(String varName : sharedVars){
             LabelingFunction l1 = tp1.getLabelingFunction(varName);
@@ -175,14 +213,15 @@ public class TagPiece {
             if(l1 == null){
                 if(l2 != null)
                     return false;
-            } else if(!l1.equals(l2)){
+            } else if(!l1.equals(l2)){ // TODO: rivedere se effettuare controlli sulla labeling fucntion
                 return false;
             }
         }
         return true;
     }
+    */
     
-    // TODO: bisogna aggiungere il controllo che le labeling function siano uguali
+    // TODO: aggiungere il controllo che le labeling function siano uguali
     public static boolean isUnifiable(TagPiece tp1, TagPiece tp2, 
             HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
             ArrayList<String> sharedVars){
@@ -198,7 +237,7 @@ public class TagPiece {
                 
                 Tag t1 = m1[i1][j1];
                 Tag t2 = m2[i2][j2];
-                if(!(m1[i1][j1].equals(m2[i2][j2]) && isLabelingFunctionUnifiable(tp1, tp2, sharedVars))
+                if(!(m1[i1][j1].equals(m2[i2][j2]) /*&& isLabelingFunctionUnifiable(tp1, tp2, sharedVars)*/)
                         /*|| !(tp1.labelingFunction(j1) == null && 
                         tp2.labelingFunction(j2) == null || tp1.labelingFunction(j1) != null && 
                         tp1.labelingFunction(j1).equals(tp2.labelingFunction(j2)))*/ ){
@@ -217,17 +256,20 @@ public class TagPiece {
             HashMap<String, Integer> varMapComp, Tag epsilon) throws Exception {
         
         Tag[][] matrix = new Tag[varMapComp.size()][varMapComp.size()];
-        // Var[] labelingFunction = new Var[varMapComp.size()];
-        LabelingFunction[] labelingFunction = new LabelingFunction[varMapComp.size()];
+        ArrayList<ArrayList<LabelingFunction>> labelingFunction = new ArrayList<>(varMapComp.size());
         
-        for(int i=0; i<matrix.length; i++){
+        for(int i=0; i<varMapComp.size(); i++){
+            labelingFunction.add(new ArrayList<>());
             for(int j=0; j<matrix[0].length; j++){
                 matrix[i][j] = epsilon;
             }
         }
         
         for(Map.Entry<String, Integer> v : varMap1.entrySet()){
-            labelingFunction[varMapComp.get(v.getKey())] = tp1.getLabelingFunction()[v.getValue()];
+            for(LabelingFunction lf : tp1.getLabelingFunction().get(v.getValue())){
+                labelingFunction.get(varMapComp.get(v.getKey())).add(lf);
+            }
+            
             for(Map.Entry<String, Integer> w : varMap1.entrySet()){
                 matrix[varMapComp.get(v.getKey())][varMapComp.get(w.getKey())] = 
                         tp1.getMatrix()[v.getValue()][w.getValue()];
@@ -235,7 +277,10 @@ public class TagPiece {
         }
         
         for(Map.Entry<String, Integer> v : varMap2.entrySet()){
-            labelingFunction[varMapComp.get(v.getKey())] = tp2.getLabelingFunction()[v.getValue()];
+            for(LabelingFunction lf : tp2.getLabelingFunction().get(v.getValue())){
+                labelingFunction.get(varMapComp.get(v.getKey())).add(lf);
+            }
+            
             for(Map.Entry<String, Integer> w : varMap2.entrySet()){
                 matrix[varMapComp.get(v.getKey())][varMapComp.get(w.getKey())] = 
                         tp2.getMatrix()[v.getValue()][w.getValue()];

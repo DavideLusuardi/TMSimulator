@@ -113,6 +113,7 @@ public class TagMachine {
     }
     */
     
+    // TODO: gestire quando c'è un solo stato o nessuno
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
         Scanner scan = new Scanner(System.in);
         FileWriter xFile = new FileWriter("x_paper.txt");
@@ -129,31 +130,40 @@ public class TagMachine {
             varValues.put(entry.getKey(), this.initialVarValues[entry.getValue()]);
         }
         
-        /*
-        ArrayList<ArrayList<Tag>> behaviorsTag = new ArrayList<>(varMap.size());
-        ArrayList<ArrayList<Var>> behaviorsVarValue = new ArrayList<>(varMap.size());
-        for(int i=0; i < varMap.size(); i++){
-            behaviorsTag.add(new ArrayList<>());
-            behaviorsVarValue.add(new ArrayList<>());
-        }
-        */
-        
         int state=initialState;
-        for(int i=0; i<steps && edges.get(state).size()>0; i++){
-            int nextStateIndex = -1;                        
-            if(random) {
-                nextStateIndex = ThreadLocalRandom.current().nextInt(edges.get(state).size()); // TODO: gestire quando c'è un solo stato o nessuno
-            } else {
-                while(nextStateIndex < 0 || nextStateIndex >= edges.get(state).size()){
-                    //System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, edges.get(state).size()-1));
-                    //nextStateIndex = scan.nextInt();
-                    nextStateIndex = 0;
+        for(int i=0; i<steps; i++){
+            
+            ArrayList<Integer> nextStateIndexes = new ArrayList<>(edges.get(state).size());
+            for(int j=0; j<edges.get(state).size(); j++){
+                TagPiece tp = edges.get(state).get(j).getTagPiece();
+                if(tp.isLabelingFunctionUnifiable(varValues)){
+                    nextStateIndexes.add(j);
                 }
+            }
+            
+            if(nextStateIndexes.isEmpty()){
+                System.out.println("nessuna transizione possibile");
+                break;
+            }
+            
+            System.out.println(nextStateIndexes);
+            
+            int nextStateIndex = -1;                        
+            if(random || nextStateIndexes.size() == 1) {
+                int rnd = ThreadLocalRandom.current().nextInt(nextStateIndexes.size());
+                nextStateIndex = nextStateIndexes.get(rnd);
+            } else {
+                int choice = -1;
+                while(choice < 0 || nextStateIndex >= nextStateIndexes.size()){
+                    System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, nextStateIndexes.size()-1));
+                    choice = scan.nextInt();
+                }
+                nextStateIndex = nextStateIndexes.get(choice);
             }
             
             TagPiece tagPiece = edges.get(state).get(nextStateIndex).getTagPiece();
             tagVector = tagPiece.apply(tagVector); // update tagVector
-            varValues = tagPiece.labelingFunction(varValues); // update varValues // TODO: controllare che la funzione restituisca il risultato corretto
+            varValues = tagPiece.applyLabelingFunction(varValues); // update varValues // TODO: controllare che la funzione restituisca il risultato corretto
             
             if(debug){
                 System.out.println(String.format("\n%d -> %d", edges.get(state).get(nextStateIndex).getFromState(), 
@@ -169,15 +179,6 @@ public class TagMachine {
             xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
             awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
             // jFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("j").toString()));
-
-            
-            /*
-            Integer[] updatedVarIndexes = tagPiece.domLabelingFunction();
-            for(int varIndex : updatedVarIndexes){
-                behaviorsTag.get(varIndex).add(tagVector[varIndex]);
-                // behaviorsVarValue.get(varIndex).add(tagPiece.labelingFunction(varIndex)); // TODO
-            }
-            */
             
             state = edges.get(state).get(nextStateIndex).getToState();
             
@@ -210,6 +211,7 @@ public class TagMachine {
             sb.append("\n");
         }
         
+        /*
         for(ArrayList<Edge> edgeList : this.edges){
             i=0;
             for(Edge e : edgeList){
@@ -227,6 +229,7 @@ public class TagMachine {
                 
             }
         }
+        */
         
         return sb.toString();
     }
