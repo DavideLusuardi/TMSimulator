@@ -119,6 +119,7 @@ public class TagMachine {
         FileWriter xFile = new FileWriter("x_paper.txt");
         FileWriter awFile = new FileWriter("aw_paper.txt");
         FileWriter jFile = new FileWriter("j_paper.txt");
+        FileWriter oFile = new FileWriter("output.txt");
         
         Tag[] tagVector = new Tag[varMap.size()];        
         for(int i=0; i<varMap.size(); i++){
@@ -146,7 +147,6 @@ public class TagMachine {
                 break;
             }
             
-            System.out.println(nextStateIndexes);
             
             int nextStateIndex = -1;                        
             if(random || nextStateIndexes.size() == 1) {
@@ -160,6 +160,10 @@ public class TagMachine {
                 }
                 nextStateIndex = nextStateIndexes.get(choice);
             }
+            
+            oFile.write("step: "+i+"\n");
+            for(Tag t : tagVector) oFile.write(t.toString()+", ");
+            oFile.write(String.format("\nrot=%s, cutoff=%s, torque=%s\n", varValues.get("rot"), varValues.get("cutoff"), varValues.get("u")));            
             
             TagPiece tagPiece = edges.get(state).get(nextStateIndex).getTagPiece();
             tagVector = tagPiece.apply(tagVector); // update tagVector
@@ -187,7 +191,7 @@ public class TagMachine {
         xFile.close();
         awFile.close();
         jFile.close();
-        
+        oFile.close();
     }
 
     @Override

@@ -566,10 +566,17 @@ public class Main {
         Tag[][] mu = {{d1,e,e},{e,d1,e},{e,e,d1}};
         
         // labeling function diverse da quelle di Hoa Le
+        /*
         Var[] l1 = {new BoolVar(false), new BoolVar(true), new FloatVar(0)};
         Var[] l2 = {new BoolVar(true), new BoolVar(false), new FloatVar(0)};
         Var[] l3 = {new BoolVar(false), new BoolVar(false), new FloatVar(M)};
         Var[] l4 = {new BoolVar(true), new BoolVar(true), new FloatVar(M)};
+        */
+        
+        Var[] l1 = {new BoolVar(true), new BoolVar(true), new FloatVar(0)};
+        Var[] l2 = {new BoolVar(true), new BoolVar(false), new FloatVar(M)};
+        Var[] l3 = {new BoolVar(false), new BoolVar(true), new FloatVar(0)};
+        Var[] l4 = {new BoolVar(false), new BoolVar(false), new FloatVar(M)};
         
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3, variables)));
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, variables)));
