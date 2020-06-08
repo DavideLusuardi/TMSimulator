@@ -5,12 +5,6 @@
  */
 package it.unitn.disi.tmsimulator;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,16 +13,40 @@ import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- *
+ * La classe TagMachine rappresenta una tag machine.
+ * 
  * @author davide
  */
 public class TagMachine {
+    /**
+     * mappa hash che associa ad ogni nome di variabile la sua posizione negli
+     * array
+     */
     private HashMap<String, Integer> varMap;
+    
+    /**
+     * rappresenta le transizioni tra gli stati
+     */
     private ArrayList<ArrayList<Edge>> edges;
+    
+    /**
+     * stato iniziale
+     */
     private int initialState;
+    
+    /**
+     * lista degli stati finali (accepting states)
+     */
     private int[] acceptingStates;
     
+    /**
+     * valori iniziali delle variabili
+     */
     private Var[] initialVarValues;
+    
+    /**
+     * istanza di classe Tag utilizzata per generare Tag id o epsilon
+     */
     private Tag tagInstance;
 
     // TODO: gestire TM con un solo stato e senza accepting states o non raggiungibili
@@ -80,7 +98,13 @@ public class TagMachine {
         return tagInstance;
     }
     
-    
+    /**
+     * Applica il morfismo alla TagMachine. La TagMachine viene modificata senza
+     * restituire nulla.
+     * 
+     * @param tagMorphism
+     * @throws Exception 
+     */
     // TODO: si può generare una nuova tag machine
     public void applyMorphism(Morphism tagMorphism) throws Exception {
         if(tagMorphism == null)
@@ -95,24 +119,14 @@ public class TagMachine {
         }
     }
     
-    /*
-    public TagMachine applyMorphism(Morphism tagMorphism) throws Exception {
-        if(tagMorphism == null)
-            return this;
-        
-        ArrayList<ArrayList<Edge>> edgesM = new ArrayList<>(this.edges.size());
-        for(ArrayList<Edge> edgeList : this.edges){
-            ArrayList<Edge> edgeListM = new ArrayList<>(edgeList.size());
-            edges.add(edgeListM);
-            for(Edge e : edgeList){
-                edgeListM.add(e.getTagPiece().applyMorphism(tagMorphism));
-            }
-        }
-        
-        return new TagMachine(this.varMap, edgesM, this.initialState, this.acceptingStates, this.initialVarValues, tagMorphism.getTagInstance());
-    }
-    */
-    
+    /**
+     * Esegue una simulazione della TagMachine percorrendo le sue transizioni.
+     * 
+     * @param steps Numero di transizioni da percorrere.
+     * @param random Indica se scegliere la prossima transizione in modo casuale.
+     * @param debug Indica se stampare i messaggi di debug.
+     * @throws Exception 
+     */
     // TODO: gestire quando c'è un solo stato o nessuno
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
         Scanner scan = new Scanner(System.in);
@@ -236,14 +250,5 @@ public class TagMachine {
         
         return sb.toString();
     }
-    
-    /*
-    public static TagMachine parseJSON(String filename) throws FileNotFoundException {
-        // Gson gson = new Gson();
-        // JsonReader reader = new JsonReader(new FileReader(filename));
-        JsonParser parser = new JsonParser();
-        JsonObject rootObj = parser.parse(json).getAsJsonObject();
-    }
-    */
     
 }

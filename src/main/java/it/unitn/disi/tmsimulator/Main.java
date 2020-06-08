@@ -573,6 +573,7 @@ public class Main {
         Var[] l4 = {new BoolVar(true), new BoolVar(true), new FloatVar(M)};
         */
         
+        // labeling function di Hoa Le
         Var[] l1 = {new BoolVar(true), new BoolVar(true), new FloatVar(0)};
         Var[] l2 = {new BoolVar(true), new BoolVar(false), new FloatVar(M)};
         Var[] l3 = {new BoolVar(false), new BoolVar(true), new FloatVar(0)};
