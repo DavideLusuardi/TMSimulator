@@ -116,9 +116,8 @@ public class TagMachine {
     // TODO: gestire quando c'è un solo stato o nessuno
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
         Scanner scan = new Scanner(System.in);
-        FileWriter xFile = new FileWriter("x_paper.txt");
-        FileWriter awFile = new FileWriter("aw_paper.txt");
-        FileWriter jFile = new FileWriter("j_paper.txt");
+        FileWriter xFile = new FileWriter("plots/x_without_control.txt");
+        FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
         FileWriter oFile = new FileWriter("output.txt");
         
         Tag[] tagVector = new Tag[varMap.size()];        
@@ -154,6 +153,7 @@ public class TagMachine {
                 nextStateIndex = nextStateIndexes.get(rnd);
             } else {
                 int choice = -1;
+                // choice = 1; // override choice to select always the same transition
                 while(choice < 0 || nextStateIndex >= nextStateIndexes.size()){
                     System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, nextStateIndexes.size()-1));
                     choice = scan.nextInt();
@@ -190,7 +190,6 @@ public class TagMachine {
         
         xFile.close();
         awFile.close();
-        jFile.close();
         oFile.close();
     }
 
