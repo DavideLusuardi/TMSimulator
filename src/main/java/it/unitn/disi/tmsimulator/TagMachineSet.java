@@ -5,6 +5,7 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.variables.Var;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -150,7 +151,6 @@ public class TagMachineSet extends ArrayList<TagMachine> {
      * @return
      * @throws Exception 
      */
-    
     public TagMachine compose(ArrayList<Morphism> tagMorphismList) throws Exception {
         if(this.size() < 2)
             throw new Exception("la composizione richiede almeno due TagMachine");

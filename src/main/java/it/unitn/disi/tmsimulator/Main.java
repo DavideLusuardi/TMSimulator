@@ -5,6 +5,13 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.tags.Tag;
+import it.unitn.disi.tmsimulator.tags.MaxPlusInteger;
+import it.unitn.disi.tmsimulator.tags.MaxPlusFloat;
+import it.unitn.disi.tmsimulator.variables.IntVar;
+import it.unitn.disi.tmsimulator.variables.FloatVar;
+import it.unitn.disi.tmsimulator.variables.BoolVar;
+import it.unitn.disi.tmsimulator.variables.Var;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -617,12 +624,12 @@ public class Main {
             }
         };        
         mm.add(null);
-        mm.add(null);
+        // mm.add(null);
         mm.add(m);
         
         TagMachineSet tmSet = new TagMachineSet();
         tmSet.add(tmTorque);        
-        tmSet.add(tmControl);
+        // tmSet.add(tmControl);
         tmSet.add(tmPiston1);
         TagMachine tmComp = tmSet.compose(mm);
         System.out.println("TMcomposition --------------------------------------");

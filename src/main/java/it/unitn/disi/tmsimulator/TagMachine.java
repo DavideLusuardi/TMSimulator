@@ -5,6 +5,8 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.tags.Tag;
+import it.unitn.disi.tmsimulator.variables.Var;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -167,7 +169,7 @@ public class TagMachine {
                 nextStateIndex = nextStateIndexes.get(rnd);
             } else {
                 int choice = -1;
-                // choice = 1; // override choice to select always the same transition
+                choice = 1; // override choice to select always the same transition
                 while(choice < 0 || nextStateIndex >= nextStateIndexes.size()){
                     System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, nextStateIndexes.size()-1));
                     choice = scan.nextInt();

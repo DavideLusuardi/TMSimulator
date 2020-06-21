@@ -3,16 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.unitn.disi.tmsimulator;
+package it.unitn.disi.tmsimulator.tags;
 
 /**
- *
+ * Rappresenta un tag di tipo Float avente come operazione di concatenazione la
+ * somma e come ordine parziale (totale) il classico ordinamento tra numeri.
+ * 
  * @author davide
  */
 public final class MaxPlusFloat extends Tag {
+    /**
+     * Tag epsilon. Corrisponde al valore -infinito.
+     */
     public static final MaxPlusFloat EPSILON = new MaxPlusFloat(Float.NEGATIVE_INFINITY);
+    
+    /**
+     * Tag identità. Corrisponde al valore float 0.
+     */
     public static final MaxPlusFloat IDENTITY = new MaxPlusFloat((float)0);
     
+    public static float errValue = (float)0.0001;
+    
+    /**
+     * Valore del tag.
+     */
     private Float tag;
     
     public MaxPlusFloat(Float t){
@@ -26,6 +40,15 @@ public final class MaxPlusFloat extends Tag {
         return tag;
     }
     
+    /**
+     * {@inheritDoc}.
+     * Corrisponde all'operazione di somma.
+     * Richiede un tag di tipo {@link it.unitn.disi.tmsimulator.tags.MaxPlusFloat}.
+     * 
+     * @param other
+     * @return
+     * @throws Exception 
+     */
     @Override
     public Tag concatenate(Tag other) throws Exception {
         if(other == null)
@@ -41,6 +64,13 @@ public final class MaxPlusFloat extends Tag {
         return t;
     }
 
+    /**
+     * Esegue l'operazione &gt; tra tag in base al classico ordinamento dei numeri.
+     * 
+     * @param other
+     * @return
+     * @throws Exception 
+     */
     @Override
     public boolean gt(Tag other) throws Exception {
         if(!(other instanceof MaxPlusFloat)){
@@ -79,7 +109,7 @@ public final class MaxPlusFloat extends Tag {
             if(other.isEpsilon())
                 return false;
             else
-                return Math.abs(this.tag - ((MaxPlusFloat)other).getTag()) < 0.0001; // TODO: decidere margine di errore
+                return Math.abs(this.tag - ((MaxPlusFloat)other).getTag()) < MaxPlusFloat.errValue;
         }
         
     }

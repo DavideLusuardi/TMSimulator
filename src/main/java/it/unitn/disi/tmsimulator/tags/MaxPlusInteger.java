@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.unitn.disi.tmsimulator;
+package it.unitn.disi.tmsimulator.tags;
 
 /**
- *
+ * Rappresenta un tag di tipo Integer avente come operazione di concatenazione la
+ * somma e come ordine parziale (totale) il classico ordinamento tra numeri.
+ * 
  * @author davide
  */
 public final class MaxPlusInteger extends Tag {
@@ -26,6 +28,15 @@ public final class MaxPlusInteger extends Tag {
         return tag;
     }
     
+    /**
+     * {@inheritDoc}.
+     * Corrisponde all'operazione di somma.
+     * Richiede un tag di tipo {@link it.unitn.disi.tmsimulator.tags.MaxPlusInteger}.
+     * 
+     * @param other
+     * @return
+     * @throws Exception 
+     */
     @Override
     public Tag concatenate(Tag other) throws Exception {
         if(other == null)
@@ -41,6 +52,13 @@ public final class MaxPlusInteger extends Tag {
         return t;
     }
 
+    /**
+     * Esegue l'operazione &gt; tra tag in base al classico ordinamento dei numeri.
+     * 
+     * @param other
+     * @return
+     * @throws Exception 
+     */
     @Override
     public boolean gt(Tag other) throws Exception {
         if(!(other instanceof MaxPlusInteger)){

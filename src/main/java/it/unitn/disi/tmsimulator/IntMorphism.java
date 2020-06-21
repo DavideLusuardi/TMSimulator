@@ -5,6 +5,9 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.tags.Tag;
+import it.unitn.disi.tmsimulator.tags.MaxPlusInteger;
+
 /**
  *
  * @author davide

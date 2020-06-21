@@ -6,12 +6,24 @@
 package it.unitn.disi.tmsimulator;
 
 /**
+ * Rappresenta una transizione tra due stati.
  *
  * @author davide
  */
 public class Edge {
+    /**
+     * Stato di partenza.
+     */
     private int fromState;
+    
+    /**
+     * Stato di arrivo.
+     */
     private int toState;
+    
+    /**
+     * Labeled tag piece.
+     */
     private TagPiece tagPiece;
 
     public Edge(int fromState, int toState, TagPiece tagPiece) {

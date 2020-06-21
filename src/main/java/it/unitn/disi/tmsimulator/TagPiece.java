@@ -5,6 +5,8 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.tags.Tag;
+import it.unitn.disi.tmsimulator.variables.Var;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

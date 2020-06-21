@@ -5,6 +5,8 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.variables.FloatVar;
+import it.unitn.disi.tmsimulator.variables.Var;
 import java.util.HashMap;
 import java.util.Map;
 
