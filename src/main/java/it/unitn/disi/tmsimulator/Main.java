@@ -44,7 +44,7 @@ public class Main {
     MaxPlusInteger[][] m2ee1 = {{two, eps},{eps, one}};
     IntVar[] l2ee1 = {new IntVar(0), new IntVar(0)};
     
-    
+    // esempio di Figura 1(a)
     public TagMachine generateTm1() throws Exception {
         String[] variables = {"x", "y"};
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
@@ -60,10 +60,10 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         ArrayList<Edge> edgesFrom1 = new ArrayList<>();
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(m1ee1, l1ee1, varMap)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(m0ee0, l0ee0, varMap)));
         edgesFrom0.add(new Edge(0, 1, new TagPiece(m1111, l1111, varMap)));
 
-        edgesFrom1.add(new Edge(1, 1, new TagPiece(m1ee1, l1ee1, varMap)));
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(m0ee0, l0ee0, varMap)));
         edgesFrom1.add(new Edge(1, 0, new TagPiece(m01e1, l01e1, varMap)));        
         
         edges.add(edgesFrom0);
@@ -73,6 +73,7 @@ public class Main {
         return tm;        
     }
     
+    // esempio di Figura 1(b)
     public TagMachine generateTm2() throws Exception {
         String[] variables = {"x", "z"};
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
@@ -105,6 +106,7 @@ public class Main {
         return tm;        
     }
     
+    // esempio di Figura 2(a)
     public TagMachine generateTm3() throws Exception {
         String[] variables = {"x", "y"};
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
@@ -137,6 +139,7 @@ public class Main {
         return tm;        
     }
     
+    // esempio di Figura 2(b)
     public TagMachine generateTm4() throws Exception {
         String[] variables = {"x", "z"};
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
@@ -641,6 +644,7 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-        m.runExampleEterPaper();
+        // m.runExampleEterPaper();
+        m.runExample1();
     }
 }

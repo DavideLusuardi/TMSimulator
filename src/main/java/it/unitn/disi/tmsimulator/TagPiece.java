@@ -211,7 +211,12 @@ public class TagPiece {
         HashMap<String, Var> varValuesPrime = new HashMap<>(varValues);
         
         for(Map.Entry<String, Integer> entry : this.varMap.entrySet()){
-            Var v = this.labelingFunction.get(entry.getValue()).get(0).apply(varValues); // TODO: assicurarsi ci sia almeno un elemento
+            Var v;
+            if(this.labelingFunction.get(entry.getValue()).get(0) != null)
+                v = this.labelingFunction.get(entry.getValue()).get(0).apply(varValues); // TODO: assicurarsi ci sia almeno un elemento
+            else
+                v = varValues.get(entry.getKey()); // la variabile mantiene lo stesso valore perchè la labeling function non è definita su di essa
+            
             varValuesPrime.put(entry.getKey(), v);
         }
         
