@@ -644,7 +644,7 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-        // m.runExampleEterPaper();
-        m.runExample1();
+        m.runExampleEterPaper();
+        // m.runExample1();
     }
 }

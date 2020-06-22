@@ -111,6 +111,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             initialVarValues[varMap.get(entry.getKey())] = tm1.getInitialVarValues()[entry.getValue()];
         }
         for (Map.Entry<String, Integer> entry : tm2.getVarMap().entrySet()) {
+            // TODO: controllare che sharedVars abbiano stesso valore iniziale
             initialVarValues[varMap.get(entry.getKey())] = tm2.getInitialVarValues()[entry.getValue()];
         }
         
@@ -158,7 +159,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             throw new Exception("la lunghezza della lista dei tagMorphism deve corrispondere a quella di TagMachineSet");
         
         this.get(0).applyMorphism(tagMorphismList.get(0));
-        TagMachine tmComp = this.get(0); // TODO
+        TagMachine tmComp = this.get(0);
         for(int i=1; i<this.size(); i++){
             this.get(i).applyMorphism(tagMorphismList.get(i));
             tmComp = compose(tmComp, this.get(i));
