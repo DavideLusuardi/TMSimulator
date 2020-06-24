@@ -643,9 +643,70 @@ public class Main {
         tmSet.simulate(mm, 2000, false);
     }
     
+    public TagMachine generateBaseTM() throws Exception {
+        int NUM_VARS = 10;
+        int NUM_STATES = 10;
+        
+        String[] variables = new String[NUM_VARS];        
+        int initialState = 0;
+        int[] acceptingStates = {0};
+        Var[] initialVarValues = new Var[NUM_VARS];
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        
+        for(int i=0; i<NUM_VARS; i++){
+            variables[i] = Integer.toString(i);
+            initialVarValues[i] = new BoolVar(Boolean.TRUE);
+            varMap.put(variables[i], i);
+        }
+        
+        ArrayList<ArrayList<Edge>> edges = new ArrayList<>(NUM_STATES);
+        
+        for(int from=0; from<NUM_STATES; from++){
+            ArrayList<Edge> edgesFrom = new ArrayList<>(NUM_STATES);
+            for(int to=0; to<NUM_STATES; to++){
+                
+                Tag[][] mu = new Tag[NUM_VARS][NUM_VARS];
+                LabelingFunction[] ll = new LabelingFunction[NUM_VARS];
+                for(int j=0; j<NUM_VARS; j++){
+                    ll[j] = new LabelingFunction() {
+                        @Override
+                        public Var apply(HashMap<String, Var> varValues) {
+                            return new BoolVar(Boolean.TRUE);
+                        }
+                    };
+
+                    for(int z=0; z<NUM_VARS; z++){
+                        mu[j][z] = MaxPlusInteger.IDENTITY;
+                    }
+                }
+                
+                edgesFrom.add(new Edge(from, to, new TagPiece(mu, ll, varMap)));
+            }
+            edges.add(edgesFrom);
+        }
+        
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        return tm;
+    }
+    
+    public void runExpExample() throws Exception {
+        int NUM_TM = 4;
+        int NUM_STEPS = 1000;
+        
+        TagMachineSet tmSet = new TagMachineSet();
+        for(int i=0; i<NUM_TM; i++){
+            tmSet.add(generateBaseTM());
+        }        
+        
+        tmSet.simulate(NUM_STEPS, false);
+//        TagMachine tmComp = tmSet.compose();
+//        tmComp.simulate(NUM_STEPS, false, false);
+    }
+    
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-        m.runExampleEterPaper();
+//        m.runExampleEterPaper();
         // m.runExample1();
+        m.runExpExample();
     }
 }

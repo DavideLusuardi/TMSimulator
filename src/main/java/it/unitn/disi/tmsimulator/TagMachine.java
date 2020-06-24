@@ -207,8 +207,8 @@ public class TagMachine {
                 }
                 System.out.println("");
             }
-            xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
-            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
+//            xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
+//            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
 //            jFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("j").toString()));
             
             state = edges.get(state).get(nextStateIndex).getToState();

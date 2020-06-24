@@ -169,7 +169,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             
             ArrayList<Tag> tv = new ArrayList<>(tm.getVarMap().size());
             for(int j=0; j<tm.getVarMap().size(); j++){
-                if(tagMorphismList.get(i) != null)
+                if(eterComposition && tagMorphismList.get(i) != null)
                     tv.add(tagMorphismList.get(i).getTagInstance().getIdentity());
                 else
                     tv.add(tm.getTagInstance().getIdentity());
@@ -233,7 +233,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                             unifiable = false;
                         } else {
                             Tag epsilon = this.get(i).getTagInstance().getEpsilon();
-                            if(tagMorphismList.get(i)!=null)
+                            if(eterComposition && tagMorphismList.get(i)!=null)
                                 epsilon = tagMorphismList.get(i).getTagInstance().getEpsilon();
 
                             tpComp = TagPiece.union(tpComp, tp, varMap.get(i-1), epsilon);
@@ -322,8 +322,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             }
             varValues = varValuesPrime.get(choice);
             
-            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
-            awFile.write(String.format("%s %s\n", tagVector.get(0).get(0).toString(), varValues.get(0).get("aw").toString()));
+//            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
+//            awFile.write(String.format("%s %s\n", tagVector.get(0).get(0).toString(), varValues.get(0).get("aw").toString()));
         }
 
         xFile.close();
