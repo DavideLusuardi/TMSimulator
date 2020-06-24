@@ -182,7 +182,7 @@ public class TagMachine {
                 int choice = -1;
                 choice = 1; // override choice to select always the same transition
                 while(choice < 0 || nextStateIndex >= nextStateIndexes.size()){
-                    System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, nextStateIndexes.size()-1));
+                    System.out.print(String.format("State %d, choose the next state [0-%d]: ", state, nextStateIndexes.size()-1));
                     choice = scan.nextInt();
                 }
                 nextStateIndex = nextStateIndexes.get(choice);

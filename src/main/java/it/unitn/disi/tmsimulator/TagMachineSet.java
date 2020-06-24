@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -126,6 +127,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
     
     // TODO: controllare che le TMs abbiano dimensione > 0
     public void simulate(ArrayList<Morphism> tagMorphismList, int steps, boolean random) throws Exception {
+        Scanner scan = new Scanner(System.in);
         FileWriter xFile = new FileWriter("plots/x_without_control.txt");
         FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
         
@@ -181,6 +183,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             varValues.add(vv);
         }
                 
+        HashMap<String, Boolean> unifiableTpMap = new HashMap<>();        
         
         for(int step=0; step<steps; step++){
             boolean exhausted = false;
@@ -194,35 +197,51 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 currentEdge.add(0);
             }
             
+            StringBuilder transitionId = new StringBuilder(this.size()*2);
+            
             ArrayList<ArrayList<Integer>> validEdges = new ArrayList<>();
             ArrayList<ArrayList<HashMap<String, Var>>> varValuesPrime = new ArrayList<>();
             while(!exhausted){
-                
-                // controlliamo che i tag piece siano unificabili
-                boolean unifiable = true;      
-                TagPiece tpComp = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
-                if(eterComposition && !tpComp.morphismApplied){
-                    tpComp.applyMorphism(tagMorphismList.get(0));
-                }                
-                for(int i=1; i<this.size(); i++){
-                    TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
-                    
-                    // applichiamo i morphismi al tag piece se non già applicato
-                    if(eterComposition && !tp.morphismApplied){
-                        tp.applyMorphism(tagMorphismList.get(i)); // TOOD: morphismApplied si può togliere
-                    }
-                    
-                    if(!TagPiece.isUnifiable(tpComp, tp, sharedVars.get(i-1))){
-                        unifiable = false;
-                        break;
-                    } else {
-                        Tag epsilon = this.get(i).getTagInstance().getEpsilon();
-                        if(tagMorphismList.get(i)!=null)
-                            epsilon = tagMorphismList.get(i).getTagInstance().getEpsilon();
-                        
-                        tpComp = TagPiece.union(tpComp, tp, varMap.get(i-1), epsilon);
-                    }
+                                
+                for(Integer s : currentState){
+                    transitionId.append(s);
+                    transitionId.append(",");
                 }
+                for(Integer e : currentEdge){
+                    transitionId.append(e);
+                    transitionId.append(",");
+                }
+                
+                boolean unifiable = true;
+                if(unifiableTpMap.get(transitionId.toString())!=null){
+                    unifiable = unifiableTpMap.get(transitionId.toString());
+                    
+                } else { // controlliamo che i tag piece siano unificabili                                
+                    TagPiece tpComp = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
+                    if(eterComposition && !tpComp.morphismApplied){
+                        tpComp.applyMorphism(tagMorphismList.get(0));
+                    }                
+                    for(int i=1; i<this.size() && unifiable; i++){
+                        TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
+
+                        // applichiamo i morphismi al tag piece se non già applicato
+                        if(eterComposition && !tp.morphismApplied){
+                            tp.applyMorphism(tagMorphismList.get(i)); // TOOD: morphismApplied si può togliere
+                        }
+
+                        if(!TagPiece.isUnifiable(tpComp, tp, sharedVars.get(i-1))){
+                            unifiable = false;
+                        } else {
+                            Tag epsilon = this.get(i).getTagInstance().getEpsilon();
+                            if(tagMorphismList.get(i)!=null)
+                                epsilon = tagMorphismList.get(i).getTagInstance().getEpsilon();
+
+                            tpComp = TagPiece.union(tpComp, tp, varMap.get(i-1), epsilon);
+                        }
+                    }
+                    
+                    unifiableTpMap.put(transitionId.toString(), unifiable);
+                }                                
                 
                 // controlliamo che le labeling function siano unificabili
                 if(unifiable){
@@ -259,7 +278,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                         validEdges.add(currentEdge);
                         varValuesPrime.add(varValuesPrimeEdge);
                     }                        
-                }
+                }                
                 
                 // aggiorniamo currentEdge
                 exhausted = true;
@@ -287,8 +306,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             } else {
                 choice = 1; // override choice to select always the same transition
                 while(choice < 0 || choice >= validEdges.size()){
-//                    System.out.print(String.format("State %d, choice the next state [0-%d]: ", state, nextStateIndexes.size()-1));
-//                    choice = scan.nextInt();
+                    System.out.print(String.format("Choose the transition [0-%d]: ", validEdges.size()));
+                    choice = scan.nextInt();
                 }
             }
             
