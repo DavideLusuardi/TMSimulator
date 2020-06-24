@@ -18,6 +18,8 @@ import java.util.Map;
  */
 public class TagPiece {
     
+    public boolean morphismApplied = false;
+    
     /**
      * Matrice dei tag.
      */
@@ -105,6 +107,10 @@ public class TagPiece {
     public Tag[][] getMatrix() {
         return matrix;
     }
+
+    public HashMap<String, Integer> getVarMap() {
+        return varMap;
+    }
     
     private void setMatrix(Tag[][] matrix) throws Exception {
         if(matrix.length == 0 || matrix.length != matrix[0].length){
@@ -172,6 +178,29 @@ public class TagPiece {
         return tagVectorPrime;
     }
     
+    public ArrayList<Tag> apply(ArrayList<Tag> tagVector) throws Exception {
+        if(tagVector.size() != this.matrix.length){
+            throw new Exception("il vettore dei tag ha lunghezza incompatibile con la matrice TagPiece");
+        }
+        
+        // TODO: gestire quando è presente epsilon e quando ordinamento parziale (-> non esiste max)
+        ArrayList<Tag> tagVectorPrime = new ArrayList<>(tagVector.size());
+        for(int i=0; i < tagVector.size(); i++){
+            Tag tMax = tagVector.get(i); // nel caso in cui tag piece ha una colonna di epsilon, il tag non cambia
+            
+            for(int j=0; j < tagVector.size(); j++){
+                Tag t = tagVector.get(j).concatenate(matrix[j][i]);
+                if(t.gt(tMax)){
+                    tMax = t;
+                }
+            }
+            
+            tagVectorPrime.add(tMax);
+        }
+        
+        return tagVectorPrime;
+    }
+    
     /**
      * Verifica che le labeling function applicate ai valori delle variabili 
      * siano sincronizzabili.
@@ -223,6 +252,14 @@ public class TagPiece {
         return varValuesPrime;
     }
     
+    public Var applyLabelingFunction(HashMap<String, Var> varValues, String varName){
+        if(this.varMap.get(varName) == null)
+            return null;
+        
+        LabelingFunction lf = this.labelingFunction.get(this.varMap.get(varName)).get(0);
+        return lf.apply(varValues);
+    }
+    
     /**
      * Applica il morfismo al tag piece andando ad aggiornare la matrice dei tag.
      * 
@@ -231,6 +268,9 @@ public class TagPiece {
      */
     // TODO: fix java.lang.ArrayStoreException
     public void applyMorphism(Morphism tagMorphism) throws Exception {
+        if(tagMorphism == null)
+            return;
+        
         Tag[][] m = new Tag[this.matrix.length][this.matrix.length];
         
         for(int i=0; i<this.matrix.length; i++){
@@ -239,6 +279,7 @@ public class TagPiece {
             }
         }
         this.matrix = m;
+        this.morphismApplied = true;
     }
     
     /**
@@ -246,15 +287,14 @@ public class TagPiece {
      * 
      * @param tp1
      * @param tp2
-     * @param varMap1
-     * @param varMap2
      * @param sharedVars
      * @return 
      */
     // TODO: aggiungere il controllo che le labeling function siano sincronizzabili?
-    public static boolean isUnifiable(TagPiece tp1, TagPiece tp2, 
-            HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
-            ArrayList<String> sharedVars){
+    public static boolean isUnifiable(TagPiece tp1, TagPiece tp2, ArrayList<String> sharedVars){
+        
+        HashMap<String, Integer> varMap1 = tp1.getVarMap();
+        HashMap<String, Integer> varMap2 = tp2.getVarMap();
         
         Tag[][] m1 = tp1.getMatrix();
         Tag[][] m2 = tp2.getMatrix();
@@ -284,8 +324,6 @@ public class TagPiece {
      * 
      * @param tp1
      * @param tp2
-     * @param varMap1
-     * @param varMap2
      * @param varMapComp
      * @param epsilon
      * @return
@@ -293,8 +331,10 @@ public class TagPiece {
      */
     // TODO: migliorare passando solo var non comuni
     public static TagPiece union(TagPiece tp1, TagPiece tp2, 
-            HashMap<String, Integer> varMap1, HashMap<String, Integer> varMap2, 
             HashMap<String, Integer> varMapComp, Tag epsilon) throws Exception {
+        
+        HashMap<String, Integer> varMap1 = tp1.getVarMap();
+        HashMap<String, Integer> varMap2 = tp2.getVarMap();
         
         Tag[][] matrix = new Tag[varMapComp.size()][varMapComp.size()];
         ArrayList<ArrayList<LabelingFunction>> labelingFunction = new ArrayList<>(varMapComp.size());
@@ -307,7 +347,7 @@ public class TagPiece {
         }
         
         for(Map.Entry<String, Integer> v : varMap1.entrySet()){
-            for(LabelingFunction lf : tp1.getLabelingFunction().get(v.getValue())){
+            for(LabelingFunction lf : tp1.getLabelingFunction().get(v.getValue())){ // TODO: si potrebbe puntare direttamente alla lista?
                 labelingFunction.get(varMapComp.get(v.getKey())).add(lf);
             }
             

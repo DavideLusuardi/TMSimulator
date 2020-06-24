@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -100,6 +101,16 @@ public class TagMachine {
         return tagInstance;
     }
     
+    public static ArrayList<String> getSharedVars(Set<String> variables, TagMachine tm){
+        ArrayList<String> sharedVars = new ArrayList<>(tm.getVarMap().size());
+        for(String var : variables){
+            if(tm.getVarMap().get(var) != null){ // variabile presente in tm
+                sharedVars.add(var);
+            }
+        }
+        return sharedVars;
+    }
+    
     /**
      * Applica il morfismo alla TagMachine. La TagMachine viene modificata senza
      * restituire nulla.
@@ -132,8 +143,8 @@ public class TagMachine {
     // TODO: gestire quando c'è un solo stato o nessuno
     public void simulate(int steps, boolean random, boolean debug) throws Exception {
         Scanner scan = new Scanner(System.in);
-        // FileWriter xFile = new FileWriter("plots/x_without_control.txt");
-        // FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
+        FileWriter xFile = new FileWriter("plots/x_without_control.txt");
+        FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
         FileWriter oFile = new FileWriter("output.txt");
         
         Tag[] tagVector = new Tag[varMap.size()];        
@@ -196,16 +207,16 @@ public class TagMachine {
                 }
                 System.out.println("");
             }
-            // xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
-            // awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
-            // jFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("j").toString()));
+            xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
+            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("aw").toString()));
+//            jFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get("j").toString()));
             
             state = edges.get(state).get(nextStateIndex).getToState();
             
         }
         
-        // xFile.close();
-        // awFile.close();
+        xFile.close();
+        awFile.close();
         oFile.close();
     }
 

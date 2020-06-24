@@ -627,19 +627,20 @@ public class Main {
             }
         };        
         mm.add(null);
-        // mm.add(null);
+//        mm.add(null);
         mm.add(m);
         
         TagMachineSet tmSet = new TagMachineSet();
         tmSet.add(tmTorque);        
-        // tmSet.add(tmControl);
+//        tmSet.add(tmControl);
         tmSet.add(tmPiston1);
-        TagMachine tmComp = tmSet.compose(mm);
-        System.out.println("TMcomposition --------------------------------------");
-        System.out.println(tmComp);
-        System.out.println("run of tmComp");
-        tmComp.simulate(2000, false, false);
+//        TagMachine tmComp = tmSet.compose(mm);
+//        System.out.println("TMcomposition --------------------------------------");
+//        System.out.println(tmComp);
+//        System.out.println("run of tmComp");
+//        tmComp.simulate(2000, false, false);
         
+        tmSet.simulate(mm, 2000, false);
     }
     
     public static void main(String[] args) throws Exception {
