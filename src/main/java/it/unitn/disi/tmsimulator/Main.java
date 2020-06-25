@@ -12,6 +12,7 @@ import it.unitn.disi.tmsimulator.variables.IntVar;
 import it.unitn.disi.tmsimulator.variables.FloatVar;
 import it.unitn.disi.tmsimulator.variables.BoolVar;
 import it.unitn.disi.tmsimulator.variables.Var;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -643,10 +644,12 @@ public class Main {
         tmSet.simulate(mm, m.getTagInstance(), 2000, false);
     }
     
-    public TagMachine generateBaseTM() throws Exception {
-        int NUM_VARS = 10;
-        int NUM_STATES = 10;
-        
+    int NUM_VARS = 10;
+    int NUM_STATES = 4;
+    int NUM_TM = 2;
+    int NUM_STEPS = 100;
+    
+    public TagMachine generateBaseTM() throws Exception {                
         String[] variables = new String[NUM_VARS];        
         int initialState = 0;
         int[] acceptingStates = {0};
@@ -689,18 +692,38 @@ public class Main {
         return tm;
     }
     
-    public void runExpExample() throws Exception {
-        int NUM_TM = 4;
-        int NUM_STEPS = 100;
+    public void runExpExample() throws Exception {        
         
-        TagMachineSet tmSet = new TagMachineSet();
-        for(int i=0; i<NUM_TM; i++){
-            tmSet.add(generateBaseTM());
-        }        
+        FileWriter profFile = new FileWriter("plots/profile_dynamic_composition.csv");
+        profFile.write("#tm, #states, #transitions, steps, time(ns), memory(Byte)\n");
         
-        tmSet.simulate(tmSet.get(0).getTagInstance(), NUM_STEPS, false);
-//        TagMachine tmComp = tmSet.compose();
-//        tmComp.simulate(NUM_STEPS, false, false);
+        try{
+            for(int j=0; j<6; j++){
+                System.gc();
+                
+                TagMachineSet tmSet = new TagMachineSet();
+                for(int i=0; i<NUM_TM+j; i++){
+                    tmSet.add(generateBaseTM());
+                }
+
+                System.out.println("start simulation "+j);
+
+                long startTime = System.nanoTime();
+
+                long usedByte = tmSet.simulate(NUM_STEPS, false);
+//                TagMachine tmComp = tmSet.compose();
+//                long usedByte = tmComp.simulate(NUM_STEPS, false, false);
+
+                long executionTime = System.nanoTime()-startTime;                
+                int numTms = tmSet.size();
+                int numStates = (int) Math.pow(NUM_STATES, numTms);
+                int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
+                
+                profFile.write(numTms+", "+numStates+", "+numTrans+", "+NUM_STEPS+", "+executionTime+", "+usedByte+"\n");
+            }
+        } finally {
+            profFile.close();
+        }
     }
     
     public static void main(String[] args) throws Exception {

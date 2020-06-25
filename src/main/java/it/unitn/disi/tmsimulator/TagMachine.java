@@ -141,7 +141,7 @@ public class TagMachine {
      * @throws Exception 
      */
     // TODO: gestire quando c'è un solo stato o nessuno
-    public void simulate(int steps, boolean random, boolean debug) throws Exception {
+    public long simulate(int steps, boolean random, boolean debug) throws Exception {
         Scanner scan = new Scanner(System.in);
         FileWriter xFile = new FileWriter("plots/x_without_control.txt");
         FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
@@ -218,6 +218,11 @@ public class TagMachine {
         xFile.close();
         awFile.close();
         oFile.close();
+        
+//        System.gc();
+        Runtime rt = Runtime.getRuntime();
+        long usedMB = (rt.totalMemory() - rt.freeMemory());
+        return usedMB;
     }
 
     @Override
