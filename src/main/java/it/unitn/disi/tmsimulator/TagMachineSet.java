@@ -232,21 +232,21 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         }
         
         ArrayList<Integer> currentState = new ArrayList<>(this.size());        
-//        ArrayList<ArrayList<Tag>> tagVector = new ArrayList<>(this.size());        
+        ArrayList<ArrayList<Tag>> tagVector = new ArrayList<>(this.size());        
         ArrayList<HashMap<String, Var>> varValues = new ArrayList<>(this.size());
         
         for(int i=0; i<this.size(); i++){
             TagMachine tm = this.get(i);
             currentState.add(tm.getInitialState());
             
-//            ArrayList<Tag> tv = new ArrayList<>(tm.getVarMap().size());
-//            for(int j=0; j<tm.getVarMap().size(); j++){
-//                if(eterComposition && tagMorphismList.get(i) != null)
-//                    tv.add(tagMorphismList.get(i).getTagInstance().getIdentity());
-//                else
-//                    tv.add(tm.getTagInstance().getIdentity());
-//            }
-//            tagVector.add(tv);
+            ArrayList<Tag> tv = new ArrayList<>(tm.getVarMap().size());
+            for(int j=0; j<tm.getVarMap().size(); j++){
+                if(eterComposition && tagMorphismList.get(i) != null)
+                    tv.add(tagMorphismList.get(i).getTagInstance().getIdentity());
+                else
+                    tv.add(tm.getTagInstance().getIdentity());
+            }
+            tagVector.add(tv);
             
             HashMap<String, Var> vv = new HashMap<>(tm.getInitialVarValues().length);
             for(Map.Entry<String, Integer> entry : tm.getVarMap().entrySet()){
@@ -258,12 +258,14 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 //        ArrayList<Tag> tagVector = new ArrayList<>(varMap.get(varMap.size()-1).size());
 //        for(int i=0; i<varMap.get(varMap.size()-1).size(); i++)
 //            tagVector.add(tagInstance.getIdentity());
-        Tag[] tagVector = new Tag[varMap.get(varMap.size()-1).size()];
-        for(int i=0; i<tagVector.length; i++)
-            tagVector[i] = tagInstance.getIdentity();
+//        Tag[] tagVector = new Tag[varMap.get(varMap.size()-1).size()];
+//        for(int i=0; i<tagVector.length; i++)
+//            tagVector[i] = tagInstance.getIdentity();
                 
         HashMap<String, Boolean> unifiableTpMap = new HashMap<>();
         HashMap<String, TagPiece> tpMap = new HashMap<>();
+        
+        System.out.println("start simulating");
         
         for(int step=0; step<steps; step++){
             boolean exhausted = false;
@@ -284,18 +286,18 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             ArrayList<TagPiece> tpCompEdges = new ArrayList<>();
             while(!exhausted){
                                 
-                for(Integer s : currentState){
-                    transitionId.append(s);
-                    transitionId.append(",");
-                }
-                for(Integer e : currentEdge){
-                    transitionId.append(e);
-                    transitionId.append(",");
-                }
+//                for(Integer s : currentState){
+//                    transitionId.append(s);
+//                    transitionId.append(",");
+//                }
+//                for(Integer e : currentEdge){
+//                    transitionId.append(e);
+//                    transitionId.append(",");
+//                }
                 
                 count++;
                 boolean unifiable = true;
-                if(unifiableTpMap.get(transitionId.toString())!=null){
+                if(false && unifiableTpMap.get(transitionId.toString())!=null){
                     unifiable = unifiableTpMap.get(transitionId.toString());
                     
 //                    System.out.println(count+") tp unifiable salvato = "+unifiable);
@@ -326,10 +328,10 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                         }
                     }
                     
-                    unifiableTpMap.put(transitionId.toString(), unifiable);
-                    tpMap.put(transitionId.toString(), tpComp);
+//                    unifiableTpMap.put(transitionId.toString(), unifiable);
+//                    tpMap.put(transitionId.toString(), tpComp);
                 }
-                tpCompEdges.add(tpMap.get(transitionId.toString()));
+//                tpCompEdges.add(tpMap.get(transitionId.toString()));
                 
                 // controlliamo che le labeling function siano unificabili
                 if(unifiable){
@@ -380,7 +382,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             if(random || validEdges.size() == 1) {
                 choice = ThreadLocalRandom.current().nextInt(validEdges.size());
             } else {
-                choice = 1; // override choice to select always the same transition
+                choice = 0; // override choice to select always the same transition
                 while(choice < 0 || choice >= validEdges.size()){
                     System.out.println(validEdges);
                     System.out.print(String.format("Choose the transition [0-%d]: ", validEdges.size()));
@@ -394,16 +396,16 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 currentState.set(i, e.getToState());
                 
                 
-//                tagVector.set(i, e.getTagPiece().apply(tagVector.get(i))); // si può applicare anche solo tpComp
+                tagVector.set(i, e.getTagPiece().apply(tagVector.get(i))); // si può applicare anche solo tpComp
 //                varValues.set(i, e.getTagPiece().applyLabelingFunction(varValues.get(i)));
             }
             varValues = varValuesPrime.get(choice);
-            tagVector = tpCompEdges.get(choice).apply(tagVector);
+//            tagVector = tpCompEdges.get(choice).apply(tagVector);
             
 //            System.out.println("choice: "+choice+", next state: "+currentState.toString());
             
-            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
-            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get(0).get("aw").toString()));
+//            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
+//            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get(0).get("aw").toString()));
         }
 
         xFile.close();

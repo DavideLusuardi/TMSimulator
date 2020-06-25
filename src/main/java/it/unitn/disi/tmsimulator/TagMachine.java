@@ -188,9 +188,9 @@ public class TagMachine {
                 nextStateIndex = nextStateIndexes.get(choice);
             }
             
-            oFile.write("step: "+i+"\n");
-            for(Tag t : tagVector) oFile.write(t.toString()+", ");
-            oFile.write(String.format("\nrot=%s, cutoff=%s, torque=%s\n", varValues.get("rot"), varValues.get("cutoff"), varValues.get("u")));            
+//            oFile.write("step: "+i+"\n");
+//            for(Tag t : tagVector) oFile.write(t.toString()+", ");
+//            oFile.write(String.format("\nrot=%s, cutoff=%s, torque=%s\n", varValues.get("rot"), varValues.get("cutoff"), varValues.get("u")));            
             
             TagPiece tagPiece = edges.get(state).get(nextStateIndex).getTagPiece();
             tagVector = tagPiece.apply(tagVector); // update tagVector
