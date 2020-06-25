@@ -690,8 +690,8 @@ public class Main {
     }
     
     public void runExpExample() throws Exception {
-        int NUM_TM = 4;
-        int NUM_STEPS = 1000;
+        int NUM_TM = 2;
+        int NUM_STEPS = 100;
         
         TagMachineSet tmSet = new TagMachineSet();
         for(int i=0; i<NUM_TM; i++){
@@ -705,8 +705,8 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-//        m.runExampleEterPaper();
+        m.runExampleEterPaper();
         // m.runExample1();
-        m.runExpExample();
+//        m.runExpExample();
     }
 }
