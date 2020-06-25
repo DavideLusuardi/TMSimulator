@@ -124,208 +124,6 @@ public class TagMachineSet extends ArrayList<TagMachine> {
     }
     
     
-    private int count = 0;
-    // TODO: controllare che le TMs abbiano dimensione > 0
-    public void simulate(ArrayList<Morphism> tagMorphismList, int steps, boolean random) throws Exception {
-        Scanner scan = new Scanner(System.in);
-        FileWriter xFile = new FileWriter("plots/x_without_control.txt");
-        FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
-        
-        
-        boolean eterComposition = (tagMorphismList != null);
-        
-        if(this.size() < 2) // TODO: simulazione va bene anche con una sola TM
-            throw new Exception("la composizione richiede almeno due TagMachine");
-        else if(eterComposition && tagMorphismList.size() != this.size())
-            throw new Exception("la lunghezza della lista dei tagMorphism deve corrispondere a quella di TagMachineSet");                
-        
-        
-        ArrayList<HashMap<String, Integer>> varMap = new ArrayList<>(this.size());
-        ArrayList<ArrayList<String>> sharedVars = new ArrayList<>(this.size());
-        varMap.add(new HashMap<>(this.get(0).getVarMap()));
-        int pos = varMap.get(0).size();
-        for(int i=1; i<this.size(); i++){
-//            sharedVars.add(TagMachine.getSharedVars(varNames, this.get(i)));
-            sharedVars.add(new ArrayList<>());
-            for(String var : this.get(i).getVarMap().keySet()){
-                Integer val = varMap.get(i-1).putIfAbsent(var, pos);
-                if(val == null) // chiave non presente
-                    pos++;
-                else
-                    sharedVars.get(i-1).add(var);
-            }
-            if(i+1<this.size())
-                varMap.add(new HashMap<>(varMap.get(i-1)));
-            
-        }
-        
-        ArrayList<Integer> currentState = new ArrayList<>(this.size());        
-        ArrayList<ArrayList<Tag>> tagVector = new ArrayList<>(this.size());
-        ArrayList<HashMap<String, Var>> varValues = new ArrayList<>(this.size());
-        
-        for(int i=0; i<this.size(); i++){
-            TagMachine tm = this.get(i);
-            currentState.add(tm.getInitialState());
-            
-            ArrayList<Tag> tv = new ArrayList<>(tm.getVarMap().size());
-            for(int j=0; j<tm.getVarMap().size(); j++){
-                if(eterComposition && tagMorphismList.get(i) != null)
-                    tv.add(tagMorphismList.get(i).getTagInstance().getIdentity());
-                else
-                    tv.add(tm.getTagInstance().getIdentity());
-            }
-            tagVector.add(tv);
-            
-            HashMap<String, Var> vv = new HashMap<>(tm.getInitialVarValues().length);
-            for(Map.Entry<String, Integer> entry : tm.getVarMap().entrySet()){
-                vv.put(entry.getKey(), tm.getInitialVarValues()[entry.getValue()]);
-            }
-            varValues.add(vv);
-        }
-                
-        HashMap<String, Boolean> unifiableTpMap = new HashMap<>();        
-        
-        for(int step=0; step<steps; step++){
-            boolean exhausted = false;
-            
-            ArrayList<Integer> currentEdge = new ArrayList<>(this.size());
-            for(int i=0; i<this.size(); i++){
-                if(this.get(i).getEdges().get(currentState.get(i)).isEmpty()){
-                    exhausted = true; // nessuna transizione possibile
-                    break;
-                }
-                currentEdge.add(0);
-            }
-            
-            StringBuilder transitionId = new StringBuilder(this.size()*2);
-            
-            ArrayList<ArrayList<Integer>> validEdges = new ArrayList<>();
-            ArrayList<ArrayList<HashMap<String, Var>>> varValuesPrime = new ArrayList<>();
-            while(!exhausted){
-                                
-                for(Integer s : currentState){
-                    transitionId.append(s);
-                    transitionId.append(",");
-                }
-                for(Integer e : currentEdge){
-                    transitionId.append(e);
-                    transitionId.append(",");
-                }
-                
-                count++;
-                boolean unifiable = true;
-                if(unifiableTpMap.get(transitionId.toString())!=null){
-                    unifiable = unifiableTpMap.get(transitionId.toString());
-                    
-                    System.out.println(count+") tp unifiable salvato = "+unifiable);
-                    
-                } else { // controlliamo che i tag piece siano unificabili    
-                    System.out.println(count+") tp unifiable non salvato");
-                    
-                    TagPiece tpComp = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
-                    if(eterComposition && !tpComp.morphismApplied){
-                        tpComp.applyMorphism(tagMorphismList.get(0));
-                    }                
-                    for(int i=1; i<this.size() && unifiable; i++){
-                        TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
-
-                        // applichiamo i morphismi al tag piece se non già applicato
-                        if(eterComposition && !tp.morphismApplied){
-                            tp.applyMorphism(tagMorphismList.get(i)); // TODO: morphismApplied si può togliere
-                        }
-
-                        if(!TagPiece.isUnifiable(tpComp, tp, sharedVars.get(i-1))){
-                            unifiable = false;
-                        } else {
-                            Tag epsilon = this.get(i).getTagInstance().getEpsilon();
-                            if(eterComposition && tagMorphismList.get(i)!=null)
-                                epsilon = tagMorphismList.get(i).getTagInstance().getEpsilon();
-
-                            tpComp = TagPiece.union(tpComp, tp, varMap.get(i-1), epsilon); // TODO: viene creato il tag piece unione ma non viene utilizzato
-                        }
-                    }
-                    
-                    unifiableTpMap.put(transitionId.toString(), unifiable);
-                }                                
-                
-                // controlliamo che le labeling function siano unificabili
-                if(unifiable){
-                    ArrayList<HashMap<String, Var>> varValuesPrimeEdge = new ArrayList<>(this.size());
-                    HashMap<String, Var> varValuesComp = new HashMap<>(varMap.get(varMap.size()-1).size());
-                    for(int i=0; i<this.size() && unifiable; i++){
-                        TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
-                        HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues.get(i));
-                        varValuesPrimeEdge.add(varValuesTm);
-                        
-                        for(Map.Entry<String, Var> var : varValuesTm.entrySet()){
-                            if(varValuesComp.get(var.getKey()) == null)
-                                varValuesComp.put(var.getKey(), var.getValue());
-                            else if(!var.getValue().equals(varValuesComp.get(var.getKey()))){
-                                unifiable = false;
-                                break;
-                            }                                
-                        }
-                    }
-
-                    if(unifiable){
-                        validEdges.add(new ArrayList<>(currentEdge));
-                        varValuesPrime.add(varValuesPrimeEdge);
-                    }                        
-                }                
-                
-                // aggiorniamo currentEdge
-                exhausted = true;
-                for(int i=0; i<this.size(); i++){
-                    int size = this.get(i).getEdges().get(currentState.get(i)).size();
-                    if(currentEdge.get(i) < size-1){
-                        currentEdge.set(i, currentEdge.get(i)+1);
-                        exhausted = false;
-                        break;
-                    } else {
-                        currentEdge.set(i, 0);
-                    }
-                }
-                
-            }
-            
-            if(validEdges.isEmpty()){
-                System.out.println("nessuna transizione possibile");
-                break;
-            }
-            
-            int choice = -1;
-            if(random || validEdges.size() == 1) {
-                choice = ThreadLocalRandom.current().nextInt(validEdges.size());
-            } else {
-                choice = 1; // override choice to select always the same transition
-                while(choice < 0 || choice >= validEdges.size()){
-                    System.out.println(validEdges);
-                    System.out.print(String.format("Choose the transition [0-%d]: ", validEdges.size()));
-                    choice = scan.nextInt();
-                }
-            }
-            
-            // aggiornamento currentEdge, varVector e varValues
-            for(int i=0; i<this.size(); i++){
-                Edge e = this.get(i).getEdges().get(currentState.get(i)).get(validEdges.get(choice).get(i));
-                currentState.set(i, e.getToState());
-                
-                
-                tagVector.set(i, e.getTagPiece().apply(tagVector.get(i))); // si può applicare anche solo tpComp
-//                varValues.set(i, e.getTagPiece().applyLabelingFunction(varValues.get(i)));
-            }
-            varValues = varValuesPrime.get(choice);
-            
-            System.out.println("choice: "+choice+", next state: "+currentState.toString());
-            
-//            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
-//            awFile.write(String.format("%s %s\n", tagVector.get(0).get(0).toString(), varValues.get(0).get("aw").toString()));
-        }
-
-        xFile.close();
-        awFile.close();
-    }
-    
     // TODO: fermarsi quando tmComp ha un solo stato oppure nessun acceptingState
     /**
      * Esegue la composizione omogenea di tutte le TagMachine presenti. Partendo 
@@ -397,10 +195,223 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         return tmComp;
     }
     
+    private int count = 0;
+    // TODO: controllare che le TMs abbiano dimensione > 0
+    // TODO: utilizzare tagInstance dove necessario
+    public void simulate(ArrayList<Morphism> tagMorphismList, Tag tagInstance, int steps, boolean random) throws Exception {
+        Scanner scan = new Scanner(System.in);
+        FileWriter xFile = new FileWriter("plots/x_without_control.txt");
+        FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
+        
+        
+        boolean eterComposition = (tagMorphismList != null);
+        
+        if(this.size() < 2) // TODO: simulazione va bene anche con una sola TM
+            throw new Exception("la composizione richiede almeno due TagMachine");
+        else if(eterComposition && tagMorphismList.size() != this.size())
+            throw new Exception("la lunghezza della lista dei tagMorphism deve corrispondere a quella di TagMachineSet");                
+        
+        
+        ArrayList<HashMap<String, Integer>> varMap = new ArrayList<>(this.size());
+        ArrayList<ArrayList<String>> sharedVars = new ArrayList<>(this.size());
+        varMap.add(new HashMap<>(this.get(0).getVarMap()));
+        int pos = varMap.get(0).size();
+        for(int i=1; i<this.size(); i++){
+//            sharedVars.add(TagMachine.getSharedVars(varNames, this.get(i)));
+            sharedVars.add(new ArrayList<>());
+            for(String var : this.get(i).getVarMap().keySet()){
+                Integer val = varMap.get(i-1).putIfAbsent(var, pos);
+                if(val == null) // chiave non presente
+                    pos++;
+                else
+                    sharedVars.get(i-1).add(var);
+            }
+            if(i+1<this.size())
+                varMap.add(new HashMap<>(varMap.get(i-1)));
+            
+        }
+        
+        ArrayList<Integer> currentState = new ArrayList<>(this.size());        
+//        ArrayList<ArrayList<Tag>> tagVector = new ArrayList<>(this.size());        
+        ArrayList<HashMap<String, Var>> varValues = new ArrayList<>(this.size());
+        
+        for(int i=0; i<this.size(); i++){
+            TagMachine tm = this.get(i);
+            currentState.add(tm.getInitialState());
+            
+//            ArrayList<Tag> tv = new ArrayList<>(tm.getVarMap().size());
+//            for(int j=0; j<tm.getVarMap().size(); j++){
+//                if(eterComposition && tagMorphismList.get(i) != null)
+//                    tv.add(tagMorphismList.get(i).getTagInstance().getIdentity());
+//                else
+//                    tv.add(tm.getTagInstance().getIdentity());
+//            }
+//            tagVector.add(tv);
+            
+            HashMap<String, Var> vv = new HashMap<>(tm.getInitialVarValues().length);
+            for(Map.Entry<String, Integer> entry : tm.getVarMap().entrySet()){
+                vv.put(entry.getKey(), tm.getInitialVarValues()[entry.getValue()]);
+            }
+            varValues.add(vv);
+        }
+        
+//        ArrayList<Tag> tagVector = new ArrayList<>(varMap.get(varMap.size()-1).size());
+//        for(int i=0; i<varMap.get(varMap.size()-1).size(); i++)
+//            tagVector.add(tagInstance.getIdentity());
+        Tag[] tagVector = new Tag[varMap.get(varMap.size()-1).size()];
+        for(int i=0; i<tagVector.length; i++)
+            tagVector[i] = tagInstance.getIdentity();
+                
+        HashMap<String, Boolean> unifiableTpMap = new HashMap<>();
+        HashMap<String, TagPiece> tpMap = new HashMap<>();
+        
+        for(int step=0; step<steps; step++){
+            boolean exhausted = false;
+            
+            ArrayList<Integer> currentEdge = new ArrayList<>(this.size());
+            for(int i=0; i<this.size(); i++){
+                if(this.get(i).getEdges().get(currentState.get(i)).isEmpty()){
+                    exhausted = true; // nessuna transizione possibile
+                    break;
+                }
+                currentEdge.add(0);
+            }
+            
+            StringBuilder transitionId = new StringBuilder(this.size()*2);
+            
+            ArrayList<ArrayList<Integer>> validEdges = new ArrayList<>();
+            ArrayList<ArrayList<HashMap<String, Var>>> varValuesPrime = new ArrayList<>();
+            ArrayList<TagPiece> tpCompEdges = new ArrayList<>();
+            while(!exhausted){
+                                
+                for(Integer s : currentState){
+                    transitionId.append(s);
+                    transitionId.append(",");
+                }
+                for(Integer e : currentEdge){
+                    transitionId.append(e);
+                    transitionId.append(",");
+                }
+                
+                count++;
+                boolean unifiable = true;
+                if(unifiableTpMap.get(transitionId.toString())!=null){
+                    unifiable = unifiableTpMap.get(transitionId.toString());
+                    
+//                    System.out.println(count+") tp unifiable salvato = "+unifiable);
+                    
+                } else { // controlliamo che i tag piece siano unificabili    
+//                    System.out.println(count+") tp unifiable non salvato");
+                    
+                    TagPiece tpComp = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
+                    if(eterComposition && !tpComp.morphismApplied){
+                        tpComp.applyMorphism(tagMorphismList.get(0));
+                    }                
+                    for(int i=1; i<this.size() && unifiable; i++){
+                        TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
+
+                        // applichiamo i morphismi al tag piece se non già applicato
+                        if(eterComposition && !tp.morphismApplied){
+                            tp.applyMorphism(tagMorphismList.get(i)); // TODO: morphismApplied si può togliere
+                        }
+
+                        if(!TagPiece.isUnifiable(tpComp, tp, sharedVars.get(i-1))){
+                            unifiable = false;
+                        } else {
+                            Tag epsilon = this.get(i).getTagInstance().getEpsilon();
+                            if(eterComposition && tagMorphismList.get(i)!=null)
+                                epsilon = tagMorphismList.get(i).getTagInstance().getEpsilon();
+
+                            tpComp = TagPiece.union(tpComp, tp, varMap.get(i-1), epsilon); // TODO: viene creato il tag piece unione ma non viene utilizzato
+                        }
+                    }
+                    
+                    unifiableTpMap.put(transitionId.toString(), unifiable);
+                    tpMap.put(transitionId.toString(), tpComp);
+                }
+                tpCompEdges.add(tpMap.get(transitionId.toString()));
+                
+                // controlliamo che le labeling function siano unificabili
+                if(unifiable){
+                    ArrayList<HashMap<String, Var>> varValuesPrimeEdge = new ArrayList<>(this.size());
+                    HashMap<String, Var> varValuesComp = new HashMap<>(varMap.get(varMap.size()-1).size());
+                    for(int i=0; i<this.size() && unifiable; i++){
+                        TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
+                        HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues.get(i));
+                        varValuesPrimeEdge.add(varValuesTm);
+                        
+                        for(Map.Entry<String, Var> var : varValuesTm.entrySet()){
+                            if(varValuesComp.get(var.getKey()) == null)
+                                varValuesComp.put(var.getKey(), var.getValue());
+                            else if(!var.getValue().equals(varValuesComp.get(var.getKey()))){
+                                unifiable = false;
+                                break;
+                            }                                
+                        }
+                    }
+
+                    if(unifiable){
+                        validEdges.add(new ArrayList<>(currentEdge));
+                        varValuesPrime.add(varValuesPrimeEdge);
+                    }                        
+                }                
+                
+                // aggiorniamo currentEdge
+                exhausted = true;
+                for(int i=0; i<this.size(); i++){
+                    int size = this.get(i).getEdges().get(currentState.get(i)).size();
+                    if(currentEdge.get(i) < size-1){
+                        currentEdge.set(i, currentEdge.get(i)+1);
+                        exhausted = false;
+                        break;
+                    } else {
+                        currentEdge.set(i, 0);
+                    }
+                }
+                
+            }
+            
+            if(validEdges.isEmpty()){
+                System.out.println("nessuna transizione possibile");
+                break;
+            }
+            
+            int choice = -1;
+            if(random || validEdges.size() == 1) {
+                choice = ThreadLocalRandom.current().nextInt(validEdges.size());
+            } else {
+                choice = 1; // override choice to select always the same transition
+                while(choice < 0 || choice >= validEdges.size()){
+                    System.out.println(validEdges);
+                    System.out.print(String.format("Choose the transition [0-%d]: ", validEdges.size()));
+                    choice = scan.nextInt();
+                }
+            }
+            
+            // aggiornamento currentEdge, tagVector e varValues
+            for(int i=0; i<this.size(); i++){
+                Edge e = this.get(i).getEdges().get(currentState.get(i)).get(validEdges.get(choice).get(i));
+                currentState.set(i, e.getToState());
+                
+                
+//                tagVector.set(i, e.getTagPiece().apply(tagVector.get(i))); // si può applicare anche solo tpComp
+//                varValues.set(i, e.getTagPiece().applyLabelingFunction(varValues.get(i)));
+            }
+            varValues = varValuesPrime.get(choice);
+            tagVector = tpCompEdges.get(choice).apply(tagVector);
+            
+//            System.out.println("choice: "+choice+", next state: "+currentState.toString());
+            
+            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
+            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get(0).get("aw").toString()));
+        }
+
+        xFile.close();
+        awFile.close();
+    }
     
-    
-    public void simulate(int steps, boolean random) throws Exception {
-        simulate(null, steps, random);
+    public void simulate(Tag tagInstance, int steps, boolean random) throws Exception {
+        simulate(null, tagInstance, steps, random);
     }
     
 }

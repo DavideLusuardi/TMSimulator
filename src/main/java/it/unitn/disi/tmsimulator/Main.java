@@ -640,7 +640,7 @@ public class Main {
 //        System.out.println("run of tmComp");
 //        tmComp.simulate(2000, false, false);
         
-        tmSet.simulate(mm, 2000, false);
+        tmSet.simulate(mm, m.getTagInstance(), 2000, false);
     }
     
     public TagMachine generateBaseTM() throws Exception {
@@ -690,15 +690,15 @@ public class Main {
     }
     
     public void runExpExample() throws Exception {
-        int NUM_TM = 2;
-        int NUM_STEPS = 100;
+        int NUM_TM = 3;
+        int NUM_STEPS = 1000;
         
         TagMachineSet tmSet = new TagMachineSet();
         for(int i=0; i<NUM_TM; i++){
             tmSet.add(generateBaseTM());
         }        
         
-        tmSet.simulate(NUM_STEPS, false);
+        tmSet.simulate(tmSet.get(0).getTagInstance(), NUM_STEPS, false);
 //        TagMachine tmComp = tmSet.compose();
 //        tmComp.simulate(NUM_STEPS, false, false);
     }
@@ -706,7 +706,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Main m = new Main();
         m.runExampleEterPaper();
-        // m.runExample1();
+//        m.runExample1();
 //        m.runExpExample();
     }
 }
