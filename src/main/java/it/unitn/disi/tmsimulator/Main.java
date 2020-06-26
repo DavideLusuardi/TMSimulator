@@ -694,7 +694,7 @@ public class Main {
     
     public void runExpExample() throws Exception {        
         
-        FileWriter profFile = new FileWriter("plots/static_composition_steps.csv");
+        FileWriter profFile = new FileWriter("plots/dynamic_composition_steps.csv");
         profFile.write("#tm, #states, #transitions, steps, time(ns), memory(Byte)\n");
         
         try{
@@ -711,12 +711,12 @@ public class Main {
                 int numSteps = NUM_STEPS*(j+1);                
                 long startTime = System.nanoTime();
 
-//                long usedByte = tmSet.simulate(numSteps, false);
+                long usedByte = tmSet.simulate(numSteps, false);
                 
 //                long usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, false);                
                 
-                TagMachine tmComp = tmSet.compose();
-                long usedByte = tmComp.simulate(numSteps, false, false);
+//                TagMachine tmComp = tmSet.compose();
+//                long usedByte = tmComp.simulate(numSteps, false, false);
 
                 long executionTime = System.nanoTime()-startTime;                
                 int numTms = tmSet.size();

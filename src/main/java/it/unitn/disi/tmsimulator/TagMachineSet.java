@@ -214,22 +214,18 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             tagInstance = this.get(0).getTagInstance();
         
         
-        // costruzione degli array varMap e sharedVars della i-esima TM rispetto alla composizione di quelle precedenti
-        ArrayList<HashMap<String, Integer>> varMap = new ArrayList<>(this.size());
+        HashMap<String, Integer> varMap = new HashMap<>(this.get(0).getVarMap());
         ArrayList<ArrayList<String>> sharedVars = new ArrayList<>(this.size());
-        varMap.add(new HashMap<>(this.get(0).getVarMap()));
-        int pos = varMap.get(0).size();
+        int pos = varMap.size();
         for(int i=1; i<this.size(); i++){
             sharedVars.add(new ArrayList<>());
             for(String var : this.get(i).getVarMap().keySet()){
-                Integer val = varMap.get(i-1).putIfAbsent(var, pos);
+                Integer val = varMap.putIfAbsent(var, pos);
                 if(val == null) // variabile non presente
                     pos++;
                 else
                     sharedVars.get(i-1).add(var);
             }
-            if(i+1<this.size())
-                varMap.add(new HashMap<>(varMap.get(i-1)));
         }
         
         // inizializziamo currentState con gli stati iniziali di tutte le TM,
@@ -279,10 +275,20 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 
                 // controlliamo che i tag piece siano unificabili    
                 boolean unifiable = true;
-                TagPiece tpComp = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
-                if(eterComposition && !tpComp.morphismApplied){
-                    tpComp.applyMorphism(tagMorphismList.get(0));
-                }                
+                Tag[][] matrixComp = new Tag[varMap.size()][varMap.size()];
+                for(int i=0; i<matrixComp.length; i++)
+                    for(int j=0; j<matrixComp.length; j++)
+                        matrixComp[i][j] = tagInstance.getEpsilon();
+                
+                TagPiece tp0 = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
+                if(eterComposition && !tp0.morphismApplied)
+                    tp0.applyMorphism(tagMorphismList.get(0));
+                
+                for(int i=0; i<tp0.getMatrix().length; i++)
+                    for(int j=0; j<tp0.getMatrix().length; j++)
+                        matrixComp[i][j] = tp0.getMatrix()[i][j];
+                
+                TagPiece tpComp = new TagPiece(matrixComp, varMap);
                 for(int i=1; i<this.size() && unifiable; i++){
                     TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
 
@@ -294,14 +300,14 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                     if(!TagPiece.isUnifiable(tpComp, tp, sharedVars.get(i-1))){
                         unifiable = false;
                     } else {
-                        tpComp = TagPiece.union(tpComp, tp, varMap.get(i-1), tagInstance.getEpsilon()); // TODO: viene creato il tag piece unione ma non viene utilizzato
+                        TagPiece.union(tpComp, tp);
                     }
                 }
                 
                 // controlliamo che le labeling function siano unificabili
                 if(unifiable){
                     ArrayList<HashMap<String, Var>> varValuesPrimeEdge = new ArrayList<>(this.size());
-                    HashMap<String, Var> varValuesComp = new HashMap<>(varMap.get(varMap.size()-1).size());
+                    HashMap<String, Var> varValuesComp = new HashMap<>(varMap.size());
                     for(int i=0; i<this.size() && unifiable; i++){
                         TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
                         HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues.get(i));
@@ -366,7 +372,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             varValues = varValuesPrime.get(choice);
             
 //            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
-//            awFile.write(String.format("%s %s\n", tagVector[0].toString(), varValues.get(0).get("aw").toString()));
+//            awFile.write(String.format("%s %s\n", tagVector.get(0).get(0).toString(), varValues.get(0).get("aw").toString()));
         }
 
         xFile.close();
@@ -393,21 +399,18 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         
         
         // costruzione degli array varMap e sharedVars della i-esima TM rispetto alla composizione di quelle precedenti
-        ArrayList<HashMap<String, Integer>> varMap = new ArrayList<>(this.size());
+        HashMap<String, Integer> varMap = new HashMap<>(this.get(0).getVarMap());
         ArrayList<ArrayList<String>> sharedVars = new ArrayList<>(this.size());
-        varMap.add(new HashMap<>(this.get(0).getVarMap()));
-        int pos = varMap.get(0).size();
+        int pos = varMap.size();
         for(int i=1; i<this.size(); i++){
             sharedVars.add(new ArrayList<>());
             for(String var : this.get(i).getVarMap().keySet()){
-                Integer val = varMap.get(i-1).putIfAbsent(var, pos);
+                Integer val = varMap.putIfAbsent(var, pos);
                 if(val == null) // variabile non presente
                     pos++;
                 else
                     sharedVars.get(i-1).add(var);
             }
-            if(i+1<this.size())
-                varMap.add(new HashMap<>(varMap.get(i-1)));
         }
         
         // inizializziamo currentState con gli stati iniziali di tutte le TM,
@@ -480,10 +483,25 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                     unifiable = unifiableTpMap.get(transitionId.toString());
                     
                 } else {                    
-                    TagPiece tpComp = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
-                    if(eterComposition && !tpComp.morphismApplied){
-                        tpComp.applyMorphism(tagMorphismList.get(0));
-                    }                
+                    Tag[][] matrixComp = new Tag[varMap.size()][varMap.size()];
+                    for (int i = 0; i < matrixComp.length; i++) {
+                        for (int j = 0; j < matrixComp.length; j++) {
+                            matrixComp[i][j] = tagInstance.getEpsilon();
+                        }
+                    }
+
+                    TagPiece tp0 = this.get(0).getEdges().get(currentState.get(0)).get(currentEdge.get(0)).getTagPiece();
+                    if (eterComposition && !tp0.morphismApplied) {
+                        tp0.applyMorphism(tagMorphismList.get(0));
+                    }
+
+                    for (int i = 0; i < tp0.getMatrix().length; i++) {
+                        for (int j = 0; j < tp0.getMatrix().length; j++) {
+                            matrixComp[i][j] = tp0.getMatrix()[i][j];
+                        }
+                    }
+
+                    TagPiece tpComp = new TagPiece(matrixComp, varMap);                
                     for(int i=1; i<this.size() && unifiable; i++){
                         TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
 
@@ -495,7 +513,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                         if(!TagPiece.isUnifiable(tpComp, tp, sharedVars.get(i-1))){
                             unifiable = false;
                         } else {
-                            tpComp = TagPiece.union(tpComp, tp, varMap.get(i-1), tagInstance.getEpsilon()); // TODO: viene creato il tag piece unione ma non viene utilizzato
+                            TagPiece.union(tpComp, tp);
                         }
                     }
                     
@@ -507,7 +525,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 // controlliamo che le labeling function siano unificabili
                 if(unifiable){
                     ArrayList<HashMap<String, Var>> varValuesPrimeEdge = new ArrayList<>(this.size());
-                    HashMap<String, Var> varValuesComp = new HashMap<>(varMap.get(varMap.size()-1).size());
+                    HashMap<String, Var> varValuesComp = new HashMap<>(varMap.size());
                     for(int i=0; i<this.size() && unifiable; i++){
                         TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
                         HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues.get(i));

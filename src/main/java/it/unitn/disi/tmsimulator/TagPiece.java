@@ -40,6 +40,11 @@ public class TagPiece {
      */
     private HashMap<String, Integer> varMap;
     
+    public TagPiece(Tag[][] matrix, HashMap<String, Integer> varMap) throws Exception {
+        setMatrix(matrix);
+        this.varMap = varMap;
+    }
+    
     public TagPiece(Tag[][] matrix, ArrayList<ArrayList<LabelingFunction>> labelingFunction, 
             HashMap<String, Integer> varMap) throws Exception {
         
@@ -370,6 +375,23 @@ public class TagPiece {
         
         TagPiece tpComp = new TagPiece(matrix, labelingFunction, varMapComp);
         return tpComp;
+    }
+    
+    
+    public static void union(TagPiece tpComp, TagPiece tp) throws Exception {
+        
+        HashMap<String, Integer> varMapComp = tpComp.getVarMap();
+        HashMap<String, Integer> varMap = tp.getVarMap();
+        
+        Tag[][] matrix = tpComp.getMatrix();
+        
+        for(Map.Entry<String, Integer> v : varMap.entrySet()){
+            for(Map.Entry<String, Integer> w : varMap.entrySet()){
+                matrix[varMapComp.get(v.getKey())][varMapComp.get(w.getKey())] = 
+                        tp.getMatrix()[v.getValue()][w.getValue()];
+            }
+        }        
+        
     }
 
 }
