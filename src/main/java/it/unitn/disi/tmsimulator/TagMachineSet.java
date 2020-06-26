@@ -10,7 +10,6 @@ import it.unitn.disi.tmsimulator.variables.Var;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
@@ -228,28 +227,28 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             }
         }
         
-        // inizializziamo currentState con gli stati iniziali di tutte le TM,
-        // tagVector con il tag identità e varValues con i valori iniziali delle variabili
-        ArrayList<Integer> currentState = new ArrayList<>(this.size());        
-        ArrayList<ArrayList<Tag>> tagVector = new ArrayList<>(this.size());        
-        ArrayList<HashMap<String, Var>> varValues = new ArrayList<>(this.size());
+        // inizializziamo currentState con gli stati iniziali di tutte le TM
+        // e varValues con i valori iniziali delle variabili
+        ArrayList<Integer> currentState = new ArrayList<>(this.size());                
+        HashMap<String, Var> varValues = new HashMap<>(varMap.size());
         
         for(int i=0; i<this.size(); i++){
             TagMachine tm = this.get(i);
             currentState.add(tm.getInitialState());
             
-            // inizializzazione tagVector
-            ArrayList<Tag> tv = new ArrayList<>(tm.getVarMap().size());
-            for(int j=0; j<tm.getVarMap().size(); j++)
-                tv.add(tagInstance.getIdentity());            
-            tagVector.add(tv);
-            
             // inizializzazione varValues
-            HashMap<String, Var> vv = new HashMap<>(tm.getInitialVarValues().length);
-            for(Map.Entry<String, Integer> entry : tm.getVarMap().entrySet())
-                vv.put(entry.getKey(), tm.getInitialVarValues()[entry.getValue()]);
-            varValues.add(vv);
+            for(Map.Entry<String, Integer> entry : tm.getVarMap().entrySet()){
+                Var currentVar = varValues.putIfAbsent(entry.getKey(), tm.getInitialVarValues()[entry.getValue()]);
+                if(currentVar != null && !currentVar.equals(tm.getInitialVarValues()[entry.getValue()])){
+                    throw new Exception("I valori iniziali delle variabili non sono uguali tra le tag machine");
+                }
+            }
         }
+        
+        // inizializziamo tagVector con il tag identità
+        ArrayList<Tag> tagVector = new ArrayList<>(varMap.size());
+        for(int i=0; i<varMap.size(); i++)
+            tagVector.add(tagInstance.getIdentity());
         
         // visitiamo le TM in parallelo verificando che la transizione sia unificabile
         for(int step=0; step<steps; step++){
@@ -265,10 +264,10 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 currentEdge.add(0);
             }
             
-            // salviamo le transizioni unificabili ed i valori delle variabili 
-            // seguendo la transizione
+            // salviamo le transizioni unificabili ed i valori delle variabili calcolati
             ArrayList<ArrayList<Integer>> validEdges = new ArrayList<>();
-            ArrayList<ArrayList<HashMap<String, Var>>> varValuesPrime = new ArrayList<>();
+            ArrayList<HashMap<String, Var>> varValuesPrime = new ArrayList<>();
+            ArrayList<TagPiece> tpPrime = new ArrayList<>();
             
             // consideriamo ogni combinazione di transizioni
             while(!exhausted){
@@ -306,17 +305,14 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 
                 // controlliamo che le labeling function siano unificabili
                 if(unifiable){
-                    ArrayList<HashMap<String, Var>> varValuesPrimeEdge = new ArrayList<>(this.size());
                     HashMap<String, Var> varValuesComp = new HashMap<>(varMap.size());
                     for(int i=0; i<this.size() && unifiable; i++){
                         TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
-                        HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues.get(i));
-                        varValuesPrimeEdge.add(varValuesTm);
+                        HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues);
                         
                         for(Map.Entry<String, Var> var : varValuesTm.entrySet()){
-                            if(varValuesComp.get(var.getKey()) == null)
-                                varValuesComp.put(var.getKey(), var.getValue());
-                            else if(!var.getValue().equals(varValuesComp.get(var.getKey()))){
+                            Var currentVar = varValuesComp.putIfAbsent(var.getKey(), var.getValue());
+                            if(currentVar != null && !var.getValue().equals(currentVar)){
                                 unifiable = false;
                                 break;
                             }                                
@@ -325,7 +321,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 
                     if(unifiable){
                         validEdges.add(new ArrayList<>(currentEdge));
-                        varValuesPrime.add(varValuesPrimeEdge);
+                        varValuesPrime.add(varValuesComp);
+                        tpPrime.add(tpComp);
                     }                        
                 }                
                 
@@ -366,10 +363,9 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             for(int i=0; i<this.size(); i++){
                 Edge e = this.get(i).getEdges().get(currentState.get(i)).get(validEdges.get(choice).get(i));
                 currentState.set(i, e.getToState());
-                
-                tagVector.set(i, e.getTagPiece().apply(tagVector.get(i)));
             }
             varValues = varValuesPrime.get(choice);
+            tagVector = tpPrime.get(choice).apply(tagVector);
             
 //            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
 //            awFile.write(String.format("%s %s\n", tagVector.get(0).get(0).toString(), varValues.get(0).get("aw").toString()));
@@ -459,8 +455,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             
             StringBuilder transitionId = new StringBuilder(this.size()*2);
             
-            // salviamo le transizioni unificabili ed i valori delle variabili 
-            // seguendo la transizione
+            // salviamo le transizioni unificabili ed i valori delle variabili calcolati
             ArrayList<ArrayList<Integer>> validEdges = new ArrayList<>();
             ArrayList<ArrayList<HashMap<String, Var>>> varValuesPrime = new ArrayList<>();
 //            ArrayList<TagPiece> tpCompEdges = new ArrayList<>();
@@ -524,17 +519,16 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 
                 // controlliamo che le labeling function siano unificabili
                 if(unifiable){
-                    ArrayList<HashMap<String, Var>> varValuesPrimeEdge = new ArrayList<>(this.size());
+                    ArrayList<HashMap<String, Var>> varValuesEdge = new ArrayList<>(this.size());
                     HashMap<String, Var> varValuesComp = new HashMap<>(varMap.size());
                     for(int i=0; i<this.size() && unifiable; i++){
                         TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
                         HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues.get(i));
-                        varValuesPrimeEdge.add(varValuesTm);
+                        varValuesEdge.add(varValuesTm);
                         
                         for(Map.Entry<String, Var> var : varValuesTm.entrySet()){
-                            if(varValuesComp.get(var.getKey()) == null)
-                                varValuesComp.put(var.getKey(), var.getValue());
-                            else if(!var.getValue().equals(varValuesComp.get(var.getKey()))){
+                            Var currentVar = varValuesComp.putIfAbsent(var.getKey(), var.getValue());
+                            if(currentVar != null && !var.getValue().equals(currentVar)){
                                 unifiable = false;
                                 break;
                             }                                
@@ -543,7 +537,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 
                     if(unifiable){
                         validEdges.add(new ArrayList<>(currentEdge));
-                        varValuesPrime.add(varValuesPrimeEdge);
+                        varValuesPrime.add(varValuesEdge);
                     }                        
                 }                
                 

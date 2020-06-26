@@ -694,7 +694,7 @@ public class Main {
     
     public void runExpExample() throws Exception {        
         
-        FileWriter profFile = new FileWriter("plots/dynamic_composition_steps.csv");
+        FileWriter profFile = new FileWriter("plots/dynamic_composition_stepsasdbjan.csv");
         profFile.write("#tm, #states, #transitions, steps, time(ns), memory(Byte)\n");
         
         try{
