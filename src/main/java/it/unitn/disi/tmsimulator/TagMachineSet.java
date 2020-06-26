@@ -210,7 +210,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         else if(eterComposition && tagMorphismList.size() != this.size())
             throw new Exception("la lunghezza della lista dei tagMorphism deve corrispondere a quella di TagMachineSet");    
         
-        if(eterComposition)
+        if(!eterComposition)
             tagInstance = this.get(0).getTagInstance();
         
         
