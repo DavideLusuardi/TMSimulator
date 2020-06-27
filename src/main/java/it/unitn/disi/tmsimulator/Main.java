@@ -649,7 +649,7 @@ public class Main {
     int NUM_TM = 4;
     int NUM_STEPS = 100;
     
-    public TagMachine generateBaseTM() throws Exception {                
+    public TagMachine generateFullyConnectedTM() throws Exception {                
         String[] variables = new String[NUM_VARS];        
         int initialState = 0;
         int[] acceptingStates = {0};
@@ -694,39 +694,99 @@ public class Main {
     
     public void runExpExample() throws Exception {        
         
-        FileWriter profFile = new FileWriter("plots/dynamic_composition_stepsasdbjan.csv");
-        profFile.write("#tm, #states, #transitions, steps, time(ns), memory(Byte)\n");
+        String[] simulationName = {"static_composition", "dynamic_composition", "dynamic_composition2"};
         
-        try{
-            for(int j=0; j<10; j++){
-                System.gc();
-                
-                TagMachineSet tmSet = new TagMachineSet();
-                for(int i=0; i<NUM_TM; i++){
-                    tmSet.add(generateBaseTM());
+        for(int z=0; z<simulationName.length; z++){
+            String sn = simulationName[z];
+            FileWriter resultsFile = new FileWriter(String.format("plots/%s.csv", sn));
+            resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
+
+            try{
+                for(int j=0; j<6; j++){
+                    System.gc();
+                    
+                    if((z==0 && j>=4) || (z==2 && j>=5))
+                        continue;
+                        
+                    TagMachineSet tmSet = new TagMachineSet();
+                    for(int i=0; i<2+j; i++){
+                        tmSet.add(generateFullyConnectedTM());
+                    }
+
+                    System.out.println(sn+" - start simulation "+j);
+
+                    int numSteps = NUM_STEPS;                
+                    long startTime = System.nanoTime();
+                    long usedByte;
+                    
+                    switch (z) {
+                        case 0:
+                            TagMachine tmComp = tmSet.compose();
+                            usedByte = tmComp.simulate(numSteps, false, false);
+                            break;
+                        case 1:
+                            usedByte = tmSet.simulate(numSteps, false);                                    
+                            break;
+                        default:
+                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, false);
+                            break;
+                    }
+
+                    long executionTime = System.nanoTime()-startTime;                
+                    int numTms = tmSet.size();
+                    int numStates = (int) Math.pow(NUM_STATES, numTms);
+                    int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
+
+                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedByte+"\n");
                 }
-
-                System.out.println("start simulation "+j);
-
-                int numSteps = NUM_STEPS*(j+1);                
-                long startTime = System.nanoTime();
-
-                long usedByte = tmSet.simulate(numSteps, false);
-                
-//                long usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, false);                
-                
-//                TagMachine tmComp = tmSet.compose();
-//                long usedByte = tmComp.simulate(numSteps, false, false);
-
-                long executionTime = System.nanoTime()-startTime;                
-                int numTms = tmSet.size();
-                int numStates = (int) Math.pow(NUM_STATES, numTms);
-                int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
-                
-                profFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedByte+"\n");
+            } catch(Exception e) {                
+            } finally {
+                resultsFile.close();
             }
-        } finally {
-            profFile.close();
+            
+            
+            resultsFile = new FileWriter(String.format("plots/%s_steps.csv", sn));
+            resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
+
+            try{
+                for(int j=0; j<10; j++){
+                    System.gc();
+
+                    TagMachineSet tmSet = new TagMachineSet();
+                    for(int i=0; i<NUM_TM; i++){
+                        tmSet.add(generateFullyConnectedTM());
+                    }
+
+                    System.out.println(sn+" steps - start simulation "+j);
+
+                    int numSteps = NUM_STEPS*(j+1);                
+                    long startTime = System.nanoTime();
+                    long usedByte;
+                            
+                    switch (z) {
+                        case 0:
+                            TagMachine tmComp = tmSet.compose();
+                            usedByte = tmComp.simulate(numSteps, false, false);
+                            break;
+                        case 1:
+                            usedByte = tmSet.simulate(numSteps, false);                                    
+                            break;
+                        default:
+                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, false);
+                            break;
+                    }
+                    
+                    long executionTime = System.nanoTime()-startTime;                
+                    int numTms = tmSet.size();
+                    int numStates = (int) Math.pow(NUM_STATES, numTms);
+                    int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
+
+                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedByte+"\n");
+                }
+            } catch(Exception e) {
+            } finally {
+                resultsFile.close();
+            }
         }
     }
     
@@ -740,7 +800,7 @@ public class Main {
         String[] variables = {"cmd", "x"};        
         int initialState = 0;
         int[] acceptingStates = {1,2,3,4,5};
-        Var[] initialVarValues = {new IntVar(0), new FloatVar(0)};
+        Var[] initialVarValues = {new IntVar(OP), new FloatVar(0)};
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
         
         for(int i=0; i<variables.length; i++){
@@ -800,7 +860,7 @@ public class Main {
         String[] variables = {"cmd", "x"};
         int initialState = 0;
         int[] acceptingStates = {1,2};
-        Var[] initialVarValues = {new IntVar(0), new FloatVar(0)};
+        Var[] initialVarValues = {new IntVar(OP), new FloatVar(0)};
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
         
         for(int i=0; i<variables.length; i++){
@@ -868,11 +928,223 @@ public class Main {
         tmComp.simulate(10, false, true);
     }
     
+//    public TagMachine generateCaldaiaTM() throws Exception {
+//        final Float LThreshold = (float)19;
+//        final Float HThreshold = (float)21;
+//        
+//        String[] variables = {"C", "T", "L", "H"};        
+//        int initialState = 0;
+//        int[] acceptingStates = {0,1};
+//        Var[] initialVarValues = {new BoolVar(Boolean.FALSE), new FloatVar(0), new BoolVar(Boolean.FALSE), new BoolVar(Boolean.FALSE)};
+//        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+//        
+//        for(int i=0; i<variables.length; i++){
+//            varMap.put(variables[i], i);
+//        }
+//        
+//        ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
+//        ArrayList<Edge> edgesFrom0 = new ArrayList<>();
+//        ArrayList<Edge> edgesFrom1 = new ArrayList<>();
+//        edges.add(edgesFrom0);
+//        edges.add(edgesFrom1);
+//        
+//        Tag[][] mu = {{one,eps},{eps,one}};
+//        
+//        LabelingFunction lfLow = new LabelingFunction() {
+//            @Override
+//            public Var apply(HashMap<String, Var> varValues) {
+//                Float temp = ((FloatVar) varValues.get("T")).getValue();
+//                if(temp < LThreshold)
+//                    return new BoolVar(Boolean.TRUE);
+//                else
+//                    return new BoolVar(Boolean.FALSE);
+//            }
+//        };
+//        
+//        LabelingFunction lfHigh = new LabelingFunction() {
+//            @Override
+//            public Var apply(HashMap<String, Var> varValues) {
+//                Float temp = ((FloatVar) varValues.get("T")).getValue();
+//                if(temp > HThreshold)
+//                    return new BoolVar(Boolean.TRUE);
+//                else
+//                    return new BoolVar(Boolean.FALSE);
+//            }
+//        };
+//        
+//        LabelingFunction lfCaldaia = new LabelingFunction() {
+//            @Override
+//            public Var apply(HashMap<String, Var> varValues) {
+//                Boolean L = ((BoolVar) varValues.get("L")).getValue();
+//                Boolean H  = ((BoolVar) varValues.get("H")).getValue();
+//                if(L)
+//                    return new BoolVar(Boolean.TRUE);
+//                else if(H)
+//                    return new BoolVar(Boolean.FALSE);
+//                else
+//                    return varValues.get("C");
+//            }
+//        };
+//        
+//        LabelingFunction lfTemp = new LabelingFunction() {
+//            @Override
+//            public Var apply(HashMap<String, Var> varValues) {
+//                Float temp = ((FloatVar) varValues.get("T")).getValue();
+//                Boolean C = ((BoolVar) varValues.get("C")).getValue();
+//                if(C)
+//                    return new FloatVar(temp+(float)0.5);
+//                else
+//                    return new FloatVar(temp-(float)0.5);
+//            }
+//        };
+//        
+//        LabelingFunction[] ll = {lfCaldaia, lfTemp, lfLow, lfHigh};
+//        
+//        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, ll, varMap)));
+//        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu, ll, varMap)));
+//        
+//        edgesFrom1.add(new Edge(1, 0, new TagPiece(mu, ll, varMap)));
+//        edgesFrom1.add(new Edge(1, 1, new TagPiece(mu, ll, varMap)));
+//        
+//        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+//        return tm;
+//    }
+    
+    public TagMachine generateCaldaiaTM() throws Exception {
+        String[] variables = {"C", "T"};        
+        int initialState = 0;
+        int[] acceptingStates = {};
+        Var[] initialVarValues = {new BoolVar(Boolean.TRUE), new FloatVar(0)};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
+        ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
+        ArrayList<Edge> edgesFrom0 = new ArrayList<>();
+        edges.add(edgesFrom0);
+        
+        Tag[][] mu = {{one,eps},{eps,one}};
+        
+        LabelingFunction lfCaldaiaOpen = new LabelingFunction() {
+            @Override
+            public Var apply(HashMap<String, Var> varValues) {
+                return new BoolVar(Boolean.TRUE);
+            }
+        };
+        
+        LabelingFunction lfCaldaiaClose = new LabelingFunction() {
+            @Override
+            public Var apply(HashMap<String, Var> varValues) {
+                return new BoolVar(Boolean.FALSE);
+            }
+        };
+        
+        LabelingFunction lfTemp = new LabelingFunction() {
+            @Override
+            public Var apply(HashMap<String, Var> varValues) {
+                Float temp = ((FloatVar) varValues.get("T")).getValue();
+                Boolean C = ((BoolVar) varValues.get("C")).getValue();
+                if(C)
+                    return new FloatVar(temp+(float)0.5);
+                else
+                    return new FloatVar(temp-(float)0.5);
+            }
+        };
+        
+        LabelingFunction[] ll0 = {lfCaldaiaClose, lfTemp};
+        LabelingFunction[] ll1 = {lfCaldaiaOpen, lfTemp};
+        
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, ll0, varMap)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, ll1, varMap)));
+        
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        return tm;
+    }
+    
+    public TagMachine generateControllerCaldaiaTM() throws Exception {
+        String[] variables = {"C", "T"};        
+        int initialState = 0;
+        int[] acceptingStates = {};
+        Var[] initialVarValues = {new BoolVar(Boolean.TRUE), new FloatVar(0)};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
+        ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
+        ArrayList<Edge> edgesFrom0 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom1 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom2 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom3 = new ArrayList<>();
+        edges.add(edgesFrom0);
+        edges.add(edgesFrom1);
+        edges.add(edgesFrom2);
+        edges.add(edgesFrom3);
+        
+        Tag[][] mu = {{one,eps},{eps,one}};
+        
+        LabelingFunction lfCaldaiaOpen = new LabelingFunction() {
+            @Override
+            public Var apply(HashMap<String, Var> varValues) {
+                return new BoolVar(Boolean.TRUE);
+            }
+        };
+        
+        LabelingFunction lfCaldaiaClose = new LabelingFunction() {
+            @Override
+            public Var apply(HashMap<String, Var> varValues) {
+                return new BoolVar(Boolean.FALSE);
+            }
+        };
+        
+        LabelingFunction lfTemp = new LabelingFunction() {
+            @Override
+            public Var apply(HashMap<String, Var> varValues) {
+                Float temp = ((FloatVar) varValues.get("T")).getValue();
+                Boolean C = ((BoolVar) varValues.get("C")).getValue();
+                if(C)
+                    return new FloatVar(temp+(float)0.5);
+                else
+                    return new FloatVar(temp-(float)0.5);
+            }
+        };
+        
+        LabelingFunction[] ll0 = {lfCaldaiaClose, lfTemp};
+        LabelingFunction[] ll1 = {lfCaldaiaOpen, lfTemp};
+        
+        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu, ll1, varMap)));
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(mu, ll0, varMap)));
+        edgesFrom2.add(new Edge(2, 3, new TagPiece(mu, ll0, varMap)));
+        edgesFrom3.add(new Edge(3, 0, new TagPiece(mu, ll1, varMap)));
+        
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        return tm;
+    }
+    
+    public void runCaldaiaExample() throws Exception {
+        TagMachine caldaia = generateCaldaiaTM();
+        TagMachine controller = generateControllerCaldaiaTM();
+        
+        TagMachineSet tmSet = new TagMachineSet();
+        tmSet.add(caldaia);
+        tmSet.add(controller);
+        
+        TagMachine tmComp = tmSet.compose();
+        System.out.println("TMcomposition --------------------------------------");
+        System.out.println(tmComp);
+        System.out.println("run of tmComp");
+        tmComp.simulate(10, false, true);
+    }
+    
     public static void main(String[] args) throws Exception {
         Main m = new Main();
 //        m.runExampleEterPaper();
 //        m.runExample1();
-//        m.runExpExample();
-        m.runTankExample();
+        m.runExpExample();
+//        m.runTankExample();
+//        m.runCaldaiaExample();
     }
 }
