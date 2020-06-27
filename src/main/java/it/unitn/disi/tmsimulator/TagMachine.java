@@ -173,6 +173,10 @@ public class TagMachine {
                 break;
             }
             
+            if(nextStateIndexes.size()==1 && debug){
+                System.out.println("una sola transizione possibile");
+            }
+            
             
             int nextStateIndex = -1;                        
             if(random || nextStateIndexes.size() == 1) {
@@ -180,7 +184,7 @@ public class TagMachine {
                 nextStateIndex = nextStateIndexes.get(rnd);
             } else {
                 int choice = -1;
-                choice = 1; // override choice to select always the same transition
+//                choice = 1; // override choice to select always the same transition
                 while(choice < 0 || nextStateIndex >= nextStateIndexes.size()){
                     System.out.print(String.format("State %d, choose the next state [0-%d]: ", state, nextStateIndexes.size()-1));
                     choice = scan.nextInt();

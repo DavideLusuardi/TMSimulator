@@ -730,10 +730,149 @@ public class Main {
         }
     }
     
+    public TagMachine generateTank() throws Exception {
+        Tag zero = new MaxPlusFloat((float)0.0);
+        Tag zp5 = new MaxPlusFloat((float)0.5);
+        Tag e1 = MaxPlusFloat.EPSILON;
+        Integer OP = 0;
+        Integer CL = 1;
+        
+        String[] variables = {"cmd", "x"};        
+        int initialState = 0;
+        int[] acceptingStates = {1,2,3,4,5};
+        Var[] initialVarValues = {new IntVar(0), new FloatVar(0)};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
+        ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
+        ArrayList<Edge> edgesFrom0 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom1 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom2 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom3 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom4 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom5 = new ArrayList<>();
+        edges.add(edgesFrom0);
+        edges.add(edgesFrom1);
+        edges.add(edgesFrom2);
+        edges.add(edgesFrom3);
+        edges.add(edgesFrom4);
+        edges.add(edgesFrom5);
+        
+        Tag[][] mu0 = {{zero,zp5},{e1,zp5}};
+        Tag[][] mu1 = {{zp5,zp5},{zp5,zp5}};
+        
+        Var[] l0 = {null, new FloatVar(0)};
+        Var[] l1 = {new IntVar(OP), new FloatVar(0)};
+        Var[] l2 = {null, new FloatVar((float)0.5)};
+        Var[] l3 = {null, new FloatVar(1)};
+        Var[] l4 = {new IntVar(CL), new FloatVar(1)};
+        
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu0, l0, varMap)));
+        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu1, l1, varMap)));
+        
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(mu0, l2, varMap)));
+        
+        edgesFrom2.add(new Edge(2, 3, new TagPiece(mu0, l3, varMap)));
+        edgesFrom2.add(new Edge(2, 4, new TagPiece(mu1, l4, varMap)));
+        
+        edgesFrom3.add(new Edge(3, 3, new TagPiece(mu0, l3, varMap)));
+        edgesFrom3.add(new Edge(3, 4, new TagPiece(mu1, l4, varMap)));
+        
+        edgesFrom4.add(new Edge(4, 5, new TagPiece(mu0, l2, varMap)));
+        
+        edgesFrom5.add(new Edge(5, 0, new TagPiece(mu0, l0, varMap)));
+        edgesFrom5.add(new Edge(5, 1, new TagPiece(mu1, l1, varMap)));        
+        
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+        return tm;
+    }
+    
+    public TagMachine generateTankController() throws Exception {
+        Tag zero = new MaxPlusInteger(0);
+        Tag one = new MaxPlusInteger(1);
+        Tag e2 = MaxPlusInteger.EPSILON;
+        Integer OP = 0;
+        Integer CL = 1;
+        
+        String[] variables = {"cmd", "x"};
+        int initialState = 0;
+        int[] acceptingStates = {1,2};
+        Var[] initialVarValues = {new IntVar(0), new FloatVar(0)};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
+        ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
+        ArrayList<Edge> edgesFrom0 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom1 = new ArrayList<>();
+        ArrayList<Edge> edgesFrom2 = new ArrayList<>();
+        edges.add(edgesFrom0);
+        edges.add(edgesFrom1);
+        edges.add(edgesFrom2);
+        
+        Tag[][] mu0 = {{zero,one},{e2,one}};
+        Tag[][] mu1 = {{one,one},{one,one}};
+        
+        Var[] l1 = {new IntVar(OP), new FloatVar(0)};
+        Var[] l2 = {null, new FloatVar((float)0.5)};
+        Var[] l3 = {new IntVar(CL), new FloatVar(1)};
+        
+        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu1, l1, varMap)));
+        edgesFrom0.add(new Edge(0, 2, new TagPiece(mu1, l3, varMap)));
+        
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(mu0, l2, varMap)));
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(mu1, l3, varMap)));
+        
+        edgesFrom2.add(new Edge(2, 1, new TagPiece(mu1, l1, varMap)));
+        edgesFrom2.add(new Edge(2, 2, new TagPiece(mu0, l2, varMap)));
+        
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        return tm;
+    }
+    
+    public void runTankExample() throws Exception {
+        TagMachine tankTM = generateTank();
+        TagMachine tankControllerTM = generateTankController();
+        
+        TagMachineSet tmSet = new TagMachineSet();
+        tmSet.add(tankTM);
+        tmSet.add(tankControllerTM);
+        
+        ArrayList<Morphism> mm = new ArrayList<>();        
+        Morphism m = new Morphism() {
+            @Override
+            public Tag map(Tag tag) throws Exception {
+                if(tag.isEpsilon())
+                    return getTagInstance().getEpsilon();
+                else
+                    return new MaxPlusFloat(((float)0.5) * ((MaxPlusInteger) tag).getTag());
+            }
+
+            @Override
+            public Tag getTagInstance() {
+                return new MaxPlusFloat();
+            }
+        };
+        mm.add(null);
+        mm.add(m);
+        
+        TagMachine tmComp = tmSet.compose(mm);
+        System.out.println("TMcomposition --------------------------------------");
+        System.out.println(tmComp);
+        System.out.println("run of tmComp");
+        tmComp.simulate(10, false, true);
+    }
+    
     public static void main(String[] args) throws Exception {
         Main m = new Main();
 //        m.runExampleEterPaper();
 //        m.runExample1();
-        m.runExpExample();
+//        m.runExpExample();
+        m.runTankExample();
     }
 }
