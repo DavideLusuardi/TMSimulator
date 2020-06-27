@@ -1,5 +1,1 @@
-#tm, #states, #transitions, steps, time(ns), memory(Byte)
-2, 16, 256, 100, 54327539, 2027568
-3, 64, 4096, 100, 171597305, 12238760
-4, 256, 65536, 100, 1537562680, 124747128
-5, 1024, 1048576, 100, 14371491837, 1845986376
+#tm, #states, #transitions, steps, time(ns), memory(byte)
