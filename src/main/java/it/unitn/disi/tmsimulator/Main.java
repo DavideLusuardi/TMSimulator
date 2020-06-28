@@ -648,6 +648,7 @@ public class Main {
     int NUM_STATES = 4;
     int NUM_TM = 4;
     int NUM_STEPS = 100;
+    boolean RND = false;
     
     public TagMachine generateFullyConnectedTM() throws Exception {                
         String[] variables = new String[NUM_VARS];        
@@ -698,14 +699,18 @@ public class Main {
         
         for(int z=0; z<simulationName.length; z++){
             String sn = simulationName[z];
-            FileWriter resultsFile = new FileWriter(String.format("plots/%s.csv", sn));
+            FileWriter resultsFile;
+            if(RND)
+                resultsFile = new FileWriter(String.format("plots/%s_rnd.csv", sn));
+            else
+                resultsFile = new FileWriter(String.format("plots/%s.csv", sn));
             resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
 
             try{
                 for(int j=0; j<6; j++){
                     System.gc();
                     
-                    if((z==0 && j>=4) || (z==2 && j>=5))
+                    if((z==0 && j>=4) || (z==2 && (j>=5 || j>=4 && RND)))
                         continue;
                         
                     TagMachineSet tmSet = new TagMachineSet();
@@ -722,13 +727,13 @@ public class Main {
                     switch (z) {
                         case 0:
                             TagMachine tmComp = tmSet.compose();
-                            usedByte = tmComp.simulate(numSteps, false, false);
+                            usedByte = tmComp.simulate(numSteps, RND, false);
                             break;
                         case 1:
-                            usedByte = tmSet.simulate(numSteps, false);                                    
+                            usedByte = tmSet.simulate(numSteps, RND);                                    
                             break;
                         default:
-                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, false);
+                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, RND);
                             break;
                     }
 
@@ -745,7 +750,10 @@ public class Main {
             }
             
             
-            resultsFile = new FileWriter(String.format("plots/%s_steps.csv", sn));
+            if(RND)
+                resultsFile = new FileWriter(String.format("plots/%s_rnd_steps.csv", sn));
+            else
+                resultsFile = new FileWriter(String.format("plots/%s_steps.csv", sn));
             resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
 
             try{
@@ -766,13 +774,13 @@ public class Main {
                     switch (z) {
                         case 0:
                             TagMachine tmComp = tmSet.compose();
-                            usedByte = tmComp.simulate(numSteps, false, false);
+                            usedByte = tmComp.simulate(numSteps, RND, false);
                             break;
                         case 1:
-                            usedByte = tmSet.simulate(numSteps, false);                                    
+                            usedByte = tmSet.simulate(numSteps, RND);                                    
                             break;
                         default:
-                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, false);
+                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, RND);
                             break;
                     }
                     
