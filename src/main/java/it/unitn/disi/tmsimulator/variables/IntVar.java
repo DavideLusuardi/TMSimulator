@@ -11,8 +11,16 @@ package it.unitn.disi.tmsimulator.variables;
  * @author davide
  */
 public class IntVar extends Var {
-    Integer value;
+    /**
+     * Il valore della variabile.
+     */
+    private Integer value;
 
+    /**
+     * Costruisce una nuova variabile.
+     * 
+     * @param value il valore della variabile.
+     */
     public IntVar(Integer value) {
         this.value = value;
     }

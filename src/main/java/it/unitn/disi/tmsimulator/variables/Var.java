@@ -14,21 +14,21 @@ public abstract class Var {
     
     /**
      * Restituisce il valore della variabile.
-     * @return 
+     * @return il valore della variabile.
      */
     public abstract Object getValue();
     
     /**
      * Genera una nuova variabile avente come valore quello passato.
-     * @param value
-     * @return 
+     * @param value il valore della variabile.
+     * @return la variabile creata.
      */
     public abstract Var newInstance(Object value);
     
     /**
      * Verifica se due variabili hanno lo stesso valore.
-     * @param other
-     * @return 
+     * @param other l'altra variabile da confrontare.
+     * @return true se hanno lo stesso valore, false altrimenti.
      */
     public abstract boolean equals(Var other);
 }

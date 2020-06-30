@@ -5,20 +5,22 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.morphism.Morphism;
 import it.unitn.disi.tmsimulator.tags.Tag;
 import it.unitn.disi.tmsimulator.variables.Var;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * La classe TagMachineSet rappresenta un insieme di TagMachine su cui è 
+ * La classe TagMachineSet rappresenta un insieme di tag machine su cui è 
  * possibile eseguire la composizione. Tale composizione può essere omogenea o
- * etherogenea. In quest'ultimo caso vengono sono necessari i TagMophism da 
- * applicare ad ogni TagMachine.
+ * eterogenea. In quest'ultimo caso sono necessari i morfismi da 
+ * applicare ad ogni tag machine.
  * 
  * 
  * @author davide
@@ -26,18 +28,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TagMachineSet extends ArrayList<TagMachine> {
     
     /**
-     * Esegue la composizione omogenea di due TagMachine.
+     * Esegue la composizione omogenea di due tag machine (composizione binaria).
      * 
-     * @param tm1
-     * @param tm2
-     * @return
+     * @param tm1 prima tag machine
+     * @param tm2 seconda tag machine
+     * @return tag machine risultato della composizione
      * @throws Exception 
      */
     public TagMachine compose(TagMachine tm1, TagMachine tm2) throws Exception {
         
         // TODO: controllare che le TMs abbiano dimensione > 0
         
-        // ricaviamo le variabili condivise e la mappatura var-index per la composizione
+        // ricaviamo le variabili condivise e la mappatura variabile-posizione per la composizione
         HashMap<String, Integer> varMap = new HashMap<>(tm1.getVarMap());
         ArrayList<String> sharedVars = new ArrayList<>(tm2.getVarMap().size());
         int pos = varMap.size();
@@ -50,63 +52,67 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             }
         }
         
+        // mappatura stato-indice per la tag machine composizione
+        HashMap<Integer, HashMap<Integer, Integer>> mapStateIndex = new HashMap<>(tm1.getEdges().size());
         ArrayList<ArrayList<Edge>> edges = new ArrayList<>(tm1.getEdges().size());
-        int[][] compStateIndexes = new int[tm1.getEdges().size()][tm2.getEdges().size()]; // TODO: si può implementare attraverso mappa hash
-        for(int i=0; i<compStateIndexes.length; i++)
-            for(int j=0; j<compStateIndexes[0].length; j++)
-                compStateIndexes[i][j] = -1;
-        
-        // TODO: usare Queue invece di ArrayList
-        ArrayList<Integer> stateQueue1 = new ArrayList<>(); // coda degli stati aggiunti per TM1
-        ArrayList<Integer> stateQueue2 = new ArrayList<>(); // coda degli stati aggiunti per TM2
-        
         edges.add(new ArrayList<>());
-        compStateIndexes[tm1.getInitialState()][tm2.getInitialState()] = 0;
+        HashMap<Integer, Integer> secondMap = new HashMap<>();
+        secondMap.put(tm2.getInitialState(), 0);
+        mapStateIndex.put(tm1.getInitialState(), secondMap);
+        
+        LinkedList<Integer> stateQueue1 = new LinkedList<>(); // coda degli stati aggiunti per TM1
+        LinkedList<Integer> stateQueue2 = new LinkedList<>(); // coda degli stati aggiunti per TM2
         stateQueue1.add(tm1.getInitialState());
         stateQueue2.add(tm2.getInitialState());
         
-        int sComp=0;
-        while(edges.size() > sComp){
-            int s1 = stateQueue1.get(sComp);
-            int s2 = stateQueue2.get(sComp);
+        while(!stateQueue1.isEmpty()){
+            int s1 = stateQueue1.poll();
+            int s2 = stateQueue2.poll();
             for(Edge e1 : tm1.getEdges().get(s1)){
                 for(Edge e2 : tm2.getEdges().get(s2)){
+                    
                     if(TagPiece.isUnifiable(e1.getTagPiece(), e2.getTagPiece(), sharedVars)){
-
-                        // System.out.println(String.format("isUnifiable: e1 %d -> %d; e2 %d -> %d", e1.getFromState(), e1.getToState(), e2.getFromState(), e2.getToState()));
-
                         TagPiece tp = TagPiece.union(e1.getTagPiece(), e2.getTagPiece(), 
-                                varMap, tm1.getTagInstance().getEpsilon()); // TODO
+                                varMap, tm1.getTagInstance().getEpsilon());
 
-                        if(compStateIndexes[e1.getToState()][e2.getToState()] == -1){ // lo stato (e1.getToState(), e2.getToState()) non esiste ancora                            
-                            compStateIndexes[e1.getToState()][e2.getToState()] = edges.size(); // il nuovo stato assume indice pari a edges.size()
+                        // controlliamo se lo stato (e1.getToState(), e2.getToState()) non esiste ancora
+                        secondMap = null;
+                        if(mapStateIndex.get(e1.getToState()) == null){
+                            secondMap = new HashMap<>();
+                            mapStateIndex.put(e1.getToState(), secondMap);
+                        } else if(mapStateIndex.get(e1.getToState()).get(e2.getToState()) == null){
+                            secondMap = mapStateIndex.get(e1.getToState());
+                        }
+                        
+                        if(secondMap != null){
+                            secondMap.put(e2.getToState(), edges.size()); // il nuovo stato assume indice pari a edges.size()
                             stateQueue1.add(e1.getToState());
                             stateQueue2.add(e2.getToState());
                             edges.add(new ArrayList<>()); // aggiungo il nuovo stato (inizialmente senza transizioni)
-                            
-                            // System.out.println(String.format("state assignment %d = (%d,%d)", edges.size()-1, e1.getToState(), e2.getToState()));
                         }
-                        Edge e = new Edge(sComp, compStateIndexes[e1.getToState()][e2.getToState()], tp);
-                        edges.get(sComp).add(e);
+                        
+                        int fromState = mapStateIndex.get(e1.getFromState()).get(e2.getFromState());
+                        int toState = mapStateIndex.get(e1.getToState()).get(e2.getToState());
+                        Edge e = new Edge(fromState, toState, tp);
+                        edges.get(fromState).add(e);
                     }
                 }
             }
-            sComp++;
         }
         
-        int initialState = compStateIndexes[tm1.getInitialState()][tm2.getInitialState()];
+        int initialState = mapStateIndex.get(tm1.getInitialState()).get(tm2.getInitialState());
         ArrayList<Integer> acceptingStates = new ArrayList<>();
         for(int i : tm1.getAcceptingStates()){
             for(int j : tm2.getAcceptingStates()){
-                if(compStateIndexes[i][j] != -1)
-                    acceptingStates.add(compStateIndexes[i][j]);
+                if(mapStateIndex.get(i) != null && mapStateIndex.get(i).get(j) != null)
+                    acceptingStates.add(mapStateIndex.get(i).get(j));
             }
         }
         
         // from ArrayList to array
         int[] accStates = new int[acceptingStates.size()];
         for(int i=0; i<acceptingStates.size(); i++)
-            accStates[i] = acceptingStates.get(i); // TODO
+            accStates[i] = acceptingStates.get(i);
         
         // assegnazione valore variabili iniziali
         Var[] initialVarValues = new Var[varMap.size()];
@@ -125,12 +131,12 @@ public class TagMachineSet extends ArrayList<TagMachine> {
     
     // TODO: fermarsi quando tmComp ha un solo stato oppure nessun acceptingState
     /**
-     * Esegue la composizione omogenea di tutte le TagMachine presenti. Partendo 
+     * Esegue la composizione omogenea di tutte le tag machine presenti. Partendo 
      * dalla prima, viene eseguita la composizione con la seconda ottenendo la 
-     * TagMachine che rappresenta la composione. A sua volta quest'ultima viene
+     * tag machine che rappresenta la composione. A sua volta quest'ultima viene
      * composta con la terza e così via.
      * 
-     * @return
+     * @return la tag machine che rappresenta la composizione
      * @throws Exception 
      */
     public TagMachine compose() throws Exception {
@@ -145,15 +151,16 @@ public class TagMachineSet extends ArrayList<TagMachine> {
     }
     
     /**
-     * Esegue la composizione eterogenea di tutte le TagMachine presenti. Prima 
-     * di eseguirne la composizione viene applicato il relativo Morphism alla
-     * TagMachine. Nel caso in cui il morfismo è null, la TagMachine rimane
+     * Esegue la composizione eterogenea di tutte le tag machine presenti. Prima 
+     * di eseguirne la composizione viene applicato il relativo morfismo alla
+     * tag machine. Nel caso in cui il morfismo è null, la tag machine rimane
      * invariata.
-     * Partendo dalla prima TagMachine, viene eseguita la composizione con la 
-     * seconda ottenendo la TagMachine che rappresenta la composione. A sua volta 
+     * Partendo dalla prima tag machine, viene eseguita la composizione con la 
+     * seconda ottenendo la tag machine che rappresenta la composione. A sua volta 
      * quest'ultima viene composta con la terza e così via.
      * 
-     * @return
+     * @param tagMorphismList lista di morfismi da applicare alle tag machine
+     * @return la tag machine che rappresenta la composizione
      * @throws Exception 
      */
     public TagMachine compose(ArrayList<Morphism> tagMorphismList) throws Exception {
@@ -167,35 +174,12 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         for(int i=1; i<this.size(); i++){
             this.get(i).applyMorphism(tagMorphismList.get(i));
             tmComp = compose(tmComp, this.get(i));
-            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            System.out.println(tmComp);
-            
-            
-            /*
-            for(ArrayList<Edge> edgeList : tmComp.getEdges()){
-                for(Edge e : edgeList){
-                    Tag[][] m = e.getTagPiece().getMatrix();
-                    System.out.print("-----|");
-                    for (Map.Entry<String, Integer> vc : tmComp.getVarMap().entrySet()) {
-                        System.out.print(vc.getKey() + "     |");
-                    }
-                    System.out.println("");
-                    for (Map.Entry<String, Integer> vr : tmComp.getVarMap().entrySet()) {
-                        System.out.print(vr.getKey()+" : ");
-                        for (Map.Entry<String, Integer> vc : tmComp.getVarMap().entrySet()) {
-                            System.out.print(m[vr.getValue()][vc.getValue()]+"|");
-                        }
-                        System.out.println("");
-                    }
-                }
-            }
-            */
         }
         return tmComp;
     }
     
+    
     // TODO: controllare che le TMs abbiano dimensione > 0
-    // TODO: utilizzare tagInstance dove necessario
     public long simulate(ArrayList<Morphism> tagMorphismList, Tag tagInstance, int steps, boolean random) throws Exception {
         Scanner scan = new Scanner(System.in);
         FileWriter xFile = new FileWriter("plots/x_without_control.txt");

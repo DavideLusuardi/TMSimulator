@@ -5,9 +5,12 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.morphism.Morphism;
+import it.unitn.disi.tmsimulator.labelingfunction.FloatLinearLabelingFunction;
+import it.unitn.disi.tmsimulator.labelingfunction.LabelingFunction;
 import it.unitn.disi.tmsimulator.tags.Tag;
-import it.unitn.disi.tmsimulator.tags.MaxPlusInteger;
-import it.unitn.disi.tmsimulator.tags.MaxPlusFloat;
+import it.unitn.disi.tmsimulator.tags.IntegerTag;
+import it.unitn.disi.tmsimulator.tags.FloatTag;
 import it.unitn.disi.tmsimulator.variables.IntVar;
 import it.unitn.disi.tmsimulator.variables.FloatVar;
 import it.unitn.disi.tmsimulator.variables.BoolVar;
@@ -17,35 +20,38 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- *
+ * Contiene alcuni esempi di composzioni sia omogenee che eterogenee.
+ * 
  * @author davide
  */
 public class Main {
     
-    MaxPlusInteger eps = MaxPlusInteger.EPSILON;
-    MaxPlusInteger id = MaxPlusInteger.IDENTITY;
-    MaxPlusInteger one = new MaxPlusInteger(1);    
-    MaxPlusInteger two = new MaxPlusInteger(2);
+    IntegerTag eps = IntegerTag.EPSILON;
+    IntegerTag id = IntegerTag.IDENTITY;
+    IntegerTag one = new IntegerTag(1);    
+    IntegerTag two = new IntegerTag(2);
 
-    MaxPlusInteger[][] m0ee0 = {{id, eps},{eps, id}};
+    IntegerTag[][] m0ee0 = {{id, eps},{eps, id}};
     IntVar[] l0ee0 = {null, null};        
 
-    MaxPlusInteger[][] m1111 = {{one,one},{one,one}};
+    IntegerTag[][] m1111 = {{one,one},{one,one}};
     IntVar[] l1111 = {new IntVar(0), new IntVar(0)};
 
-    MaxPlusInteger[][] m01e1 = {{id,one},{eps,one}};
+    IntegerTag[][] m01e1 = {{id,one},{eps,one}};
     IntVar[] l01e1 = {null, new IntVar(0)};
 
-    MaxPlusInteger[][] m1ee1 = {{one, eps},{eps, one}};
+    IntegerTag[][] m1ee1 = {{one, eps},{eps, one}};
     IntVar[] l1ee1 = {new IntVar(0), new IntVar(0)};
 
-    MaxPlusInteger[][] m0ee1 = {{id, eps},{eps, one}};
+    IntegerTag[][] m0ee1 = {{id, eps},{eps, one}};
     IntVar[] l0ee1 = {null, new IntVar(0)};
 
-    MaxPlusInteger[][] m2ee1 = {{two, eps},{eps, one}};
+    IntegerTag[][] m2ee1 = {{two, eps},{eps, one}};
     IntVar[] l2ee1 = {new IntVar(0), new IntVar(0)};
     
-    // esempio di Figura 1(a)
+    /**
+     * esempio di Figura 1(a)
+     */
     public TagMachine generateTm1() throws Exception {
         String[] variables = {"x", "y"};
         HashMap<String, Integer> varMap = new HashMap<>(variables.length);
@@ -70,7 +76,7 @@ public class Main {
         edges.add(edgesFrom0);
         edges.add(edgesFrom1);
                 
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;        
     }
     
@@ -103,7 +109,7 @@ public class Main {
         edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0, varMap)));
         edgesFrom2.add(new Edge(2, 1, new TagPiece(m1111, l1111, varMap)));        
                 
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;        
     }
     
@@ -136,7 +142,7 @@ public class Main {
         edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0, varMap)));
         edgesFrom2.add(new Edge(2, 1, new TagPiece(m2ee1, l2ee1, varMap)));        
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;        
     }
     
@@ -169,7 +175,7 @@ public class Main {
         edgesFrom2.add(new Edge(2, 2, new TagPiece(m0ee0, l0ee0, varMap)));
         edgesFrom2.add(new Edge(2, 1, new TagPiece(m2ee1, l2ee1, varMap)));        
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;        
     }
     
@@ -246,7 +252,7 @@ public class Main {
     float c12  = (float) 0.0379945;
     float c13  = (float) -0.0025700; 
     
-    MaxPlusFloat e = MaxPlusFloat.EPSILON;
+    FloatTag e = FloatTag.EPSILON;
 
     public TagMachine generateTorqueTM() throws Exception {        
         //                     0       1       2       3      4       5       6      7        8        9       10
@@ -266,7 +272,7 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         edges.add(edgesFrom0);
         
-        MaxPlusFloat d1 = new MaxPlusFloat(d);
+        FloatTag d1 = new FloatTag(d);
         Tag[][] mu = {{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1},{d1,d1,d1,d1,d1,d1,d1,d1,d1,d1,d1}};
         
         Float p1[] = {1+d*a11, d*a12, null, null, null, null, null, null, null, d*b11, null}; // x11 + d*(a11*x11 + a12*x21 + b11*torque)
@@ -338,7 +344,7 @@ public class Main {
         };
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10p, lf11}, varMap)));
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new FloatTag());
         return tm;        
     }
     
@@ -346,6 +352,11 @@ public class Main {
         float M    = (float) 12.41;
                 
         String[] variables = {"rot", "cutoff", "j", "torque"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {0};
         Var[] initialVarValues = {new BoolVar(false), new BoolVar(false), new IntVar(1), new FloatVar(M)};
@@ -354,7 +365,7 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         edges.add(edgesFrom0);
         
-        MaxPlusFloat d1 = new MaxPlusFloat((float)0.0011810); // TODO: 0.0011810 ??
+        FloatTag d1 = new FloatTag((float)0.0011810); // TODO: 0.0011810 ??
         Tag[][] mu = {{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1},{d1,d1,d1,d1}};
         
         Var[] l1 = {new BoolVar(true), new BoolVar(true), new IntVar(0), new FloatVar(0)};
@@ -362,21 +373,22 @@ public class Main {
         Var[] l3 = {new BoolVar(false), new BoolVar(true), null, new FloatVar(0)};
         Var[] l4 = {new BoolVar(false), new BoolVar(false), null, new FloatVar(M)};
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, variables)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, variables)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3, variables)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l4, variables)));
-        
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, varMap)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, varMap)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3, varMap)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l4, varMap)));
+                
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new FloatTag());
         return tm;        
     }
     
     public TagMachine generatePiston1TM() throws Exception {
         String[] variables = {"rot"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {0,1,2,3}; // H, I, C, E
         Var[] initialVarValues = {new BoolVar(false)};
@@ -391,27 +403,23 @@ public class Main {
         edges.add(edgesFrom2);
         edges.add(edgesFrom3);
         
-        MaxPlusInteger d1 = new MaxPlusInteger(1);
+        IntegerTag d1 = new IntegerTag(1);
         Tag[][] mu = {{d1}}; // NB: la matrice mu è l'unica cosa riutilizzabile
         
         Var[] l1 = {new BoolVar(true)};
         Var[] l2 = {new BoolVar(false)};
         
-        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu, l1, variables)));
-        edgesFrom1.add(new Edge(1, 2, new TagPiece(mu, l1, variables)));
-        edgesFrom2.add(new Edge(2, 3, new TagPiece(mu, l1, variables)));
-        edgesFrom3.add(new Edge(3, 0, new TagPiece(mu, l1, variables)));
+        edgesFrom0.add(new Edge(0, 1, new TagPiece(mu, l1, varMap)));
+        edgesFrom1.add(new Edge(1, 2, new TagPiece(mu, l1, varMap)));
+        edgesFrom2.add(new Edge(2, 3, new TagPiece(mu, l1, varMap)));
+        edgesFrom3.add(new Edge(3, 0, new TagPiece(mu, l1, varMap)));
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, variables)));
-        edgesFrom1.add(new Edge(1, 1, new TagPiece(mu, l2, variables)));
-        edgesFrom2.add(new Edge(2, 2, new TagPiece(mu, l2, variables)));
-        edgesFrom3.add(new Edge(3, 3, new TagPiece(mu, l2, variables)));
-        
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, varMap)));
+        edgesFrom1.add(new Edge(1, 1, new TagPiece(mu, l2, varMap)));
+        edgesFrom2.add(new Edge(2, 2, new TagPiece(mu, l2, varMap)));
+        edgesFrom3.add(new Edge(3, 3, new TagPiece(mu, l2, varMap)));
+                
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;        
     }
     
@@ -442,12 +450,12 @@ public class Main {
                 if(tag.isEpsilon())
                     return getTagInstance().getEpsilon();
                 else
-                    return new MaxPlusFloat(((float)0.0011810) * ((MaxPlusInteger) tag).getTag());
+                    return new FloatTag(((float)0.0011810) * ((IntegerTag) tag).getTag());
             }
 
             @Override
             public Tag getTagInstance() {
-                return new MaxPlusFloat();
+                return new FloatTag();
             }
         };        
         mm.add(null);
@@ -484,7 +492,7 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         edges.add(edgesFrom0);
         
-        MaxPlusFloat d1 = new MaxPlusFloat(d);
+        FloatTag d1 = new FloatTag(d);
         Tag[][] mu = {{d1,e,e,e,e,e,e,e,e,e,e},{e,d1,e,e,e,e,e,e,e,e,e},{e,e,d1,e,e,e,e,e,e,e,e},{e,e,e,d1,e,e,e,e,e,e,e},{e,e,e,e,d1,e,e,e,e,e,e},
                       {e,e,e,e,e,d1,e,e,e,e,e},{e,e,e,e,e,e,d1,e,e,e,e},{e,e,e,e,e,e,e,d1,e,e,e},{e,e,e,e,e,e,e,e,d1,e,e},{e,e,e,e,e,e,e,e,e,d1,e},{e,e,e,e,e,e,e,e,e,e,d1}};
         
@@ -559,12 +567,17 @@ public class Main {
         };
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, new LabelingFunction[]{lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lf10, lf11}, varMap)));
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new FloatTag());
         return tm;        
     }        
     
     public TagMachine generateControlTMPaper() throws Exception {        
         String[] variables = {"rot", "cutoff", "u"};
+        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
+        for(int i=0; i<variables.length; i++){
+            varMap.put(variables[i], i);
+        }
+        
         int initialState = 0;
         int[] acceptingStates = {0};
         Var[] initialVarValues = {new BoolVar(false), new BoolVar(false), new FloatVar(M)};
@@ -573,7 +586,7 @@ public class Main {
         ArrayList<Edge> edgesFrom0 = new ArrayList<>();
         edges.add(edgesFrom0);
         
-        MaxPlusFloat d1 = new MaxPlusFloat(d);
+        FloatTag d1 = new FloatTag(d);
         Tag[][] mu = {{d1,e,e},{e,d1,e},{e,e,d1}};
         
         // labeling function diverse da quelle di Hoa Le
@@ -590,16 +603,12 @@ public class Main {
         Var[] l3 = {new BoolVar(false), new BoolVar(true), new FloatVar(0)};
         Var[] l4 = {new BoolVar(false), new BoolVar(false), new FloatVar(M)};
         
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3, variables)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, variables)));
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, variables)));        
-        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l4, variables)));
-        
-        HashMap<String, Integer> varMap = new HashMap<>(variables.length);
-        for(int i=0; i<variables.length; i++){
-            varMap.put(variables[i], i);
-        }
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l3, varMap)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l1, varMap)));
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l2, varMap)));        
+        edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, l4, varMap)));
+                
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new FloatTag());
         return tm;        
     }
     
@@ -619,12 +628,12 @@ public class Main {
                 if(tag.isEpsilon())
                     return getTagInstance().getEpsilon();
                 else
-                    return new MaxPlusFloat(((float)0.0011810) * ((MaxPlusInteger) tag).getTag());
+                    return new FloatTag(((float)0.0011810) * ((IntegerTag) tag).getTag());
             }
 
             @Override
             public Tag getTagInstance() {
-                return new MaxPlusFloat();
+                return new FloatTag();
             }
         };        
         mm.add(null);
@@ -680,7 +689,7 @@ public class Main {
                     };
 
                     for(int z=0; z<NUM_VARS; z++){
-                        mu[j][z] = MaxPlusInteger.IDENTITY;
+                        mu[j][z] = IntegerTag.IDENTITY;
                     }
                 }
                 
@@ -689,7 +698,7 @@ public class Main {
             edges.add(edgesFrom);
         }
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;
     }
     
@@ -733,7 +742,7 @@ public class Main {
                             usedByte = tmSet.simulate(numSteps, RND);                                    
                             break;
                         default:
-                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, RND);
+                            usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, RND);
                             break;
                     }
 
@@ -780,7 +789,7 @@ public class Main {
                             usedByte = tmSet.simulate(numSteps, RND);                                    
                             break;
                         default:
-                            usedByte = tmSet.simulate2(null, new MaxPlusInteger(), numSteps, RND);
+                            usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, RND);
                             break;
                     }
                     
@@ -799,9 +808,9 @@ public class Main {
     }
     
     public TagMachine generateTank() throws Exception {
-        Tag zero = new MaxPlusFloat((float)0.0);
-        Tag zp5 = new MaxPlusFloat((float)0.5);
-        Tag e1 = MaxPlusFloat.EPSILON;
+        Tag zero = new FloatTag((float)0.0);
+        Tag zp5 = new FloatTag((float)0.5);
+        Tag e1 = FloatTag.EPSILON;
         Integer OP = 0;
         Integer CL = 1;
         
@@ -854,14 +863,14 @@ public class Main {
         edgesFrom5.add(new Edge(5, 0, new TagPiece(mu0, l0, varMap)));
         edgesFrom5.add(new Edge(5, 1, new TagPiece(mu1, l1, varMap)));        
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new FloatTag());
         return tm;
     }
     
     public TagMachine generateTankController() throws Exception {
-        Tag zero = new MaxPlusInteger(0);
-        Tag one = new MaxPlusInteger(1);
-        Tag e2 = MaxPlusInteger.EPSILON;
+        Tag zero = new IntegerTag(0);
+        Tag one = new IntegerTag(1);
+        Tag e2 = IntegerTag.EPSILON;
         Integer OP = 0;
         Integer CL = 1;
         
@@ -899,7 +908,7 @@ public class Main {
         edgesFrom2.add(new Edge(2, 1, new TagPiece(mu1, l1, varMap)));
         edgesFrom2.add(new Edge(2, 2, new TagPiece(mu0, l2, varMap)));
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;
     }
     
@@ -918,12 +927,12 @@ public class Main {
                 if(tag.isEpsilon())
                     return getTagInstance().getEpsilon();
                 else
-                    return new MaxPlusFloat(((float)0.5) * ((MaxPlusInteger) tag).getTag());
+                    return new FloatTag(((float)0.5) * ((IntegerTag) tag).getTag());
             }
 
             @Override
             public Tag getTagInstance() {
-                return new MaxPlusFloat();
+                return new FloatTag();
             }
         };
         mm.add(null);
@@ -1014,7 +1023,7 @@ public class Main {
 //        edgesFrom1.add(new Edge(1, 0, new TagPiece(mu, ll, varMap)));
 //        edgesFrom1.add(new Edge(1, 1, new TagPiece(mu, ll, varMap)));
 //        
-//        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusFloat());
+//        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new FloatTag());
 //        return tm;
 //    }
     
@@ -1067,7 +1076,7 @@ public class Main {
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, ll0, varMap)));
         edgesFrom0.add(new Edge(0, 0, new TagPiece(mu, ll1, varMap)));
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;
     }
     
@@ -1128,7 +1137,7 @@ public class Main {
         edgesFrom2.add(new Edge(2, 3, new TagPiece(mu, ll0, varMap)));
         edgesFrom3.add(new Edge(3, 0, new TagPiece(mu, ll1, varMap)));
         
-        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new MaxPlusInteger());
+        TagMachine tm = new TagMachine(varMap, edges, initialState, acceptingStates, initialVarValues, new IntegerTag());
         return tm;
     }
     

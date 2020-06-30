@@ -5,6 +5,8 @@
  */
 package it.unitn.disi.tmsimulator;
 
+import it.unitn.disi.tmsimulator.labelingfunction.LabelingFunction;
+import it.unitn.disi.tmsimulator.morphism.Morphism;
 import it.unitn.disi.tmsimulator.tags.Tag;
 import it.unitn.disi.tmsimulator.variables.Var;
 import java.io.FileWriter;
@@ -16,42 +18,55 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * La classe TagMachine rappresenta una tag machine.
+ * Rappresenta una tag machine.
  * 
  * @author davide
  */
 public class TagMachine {
     /**
-     * mappa hash che associa ad ogni nome di variabile la sua posizione negli
-     * array
+     * Mappa hash che associa ad ogni nome di variabile la sua posizione negli
+     * array.
      */
     private HashMap<String, Integer> varMap;
     
     /**
-     * rappresenta le transizioni tra gli stati
+     * Rappresenta le transizioni tra gli stati.
      */
     private ArrayList<ArrayList<Edge>> edges;
     
     /**
-     * stato iniziale
+     * Stato iniziale.
      */
     private int initialState;
     
     /**
-     * lista degli stati finali (accepting states)
+     * Lista degli stati finali (accepting states).
      */
     private int[] acceptingStates;
     
     /**
-     * valori iniziali delle variabili
+     * Valori iniziali delle variabili.
      */
     private Var[] initialVarValues;
     
     /**
-     * istanza di classe Tag utilizzata per generare Tag id o epsilon
+     * Istanza di classe {@link it.unitn.disi.tmsimulator.tags.Tag} utilizzata 
+     * per generare tag identità o epsilon.
+     * L'istanza rapresenta la tag structure della tag machine.
      */
     private Tag tagInstance;
 
+    /**
+     * Costruisce una nuova tag machine.
+     * 
+     * @param varMap mapping variabile-posizione
+     * @param edges transizioni
+     * @param initialState stato iniziale
+     * @param acceptingStates stati finali
+     * @param initialVarValues valori iniziali della variabili
+     * @param tagInstance istanza di tag
+     * @throws Exception 
+     */
     // TODO: gestire TM con un solo stato e senza accepting states o non raggiungibili
     public TagMachine(HashMap<String, Integer> varMap, ArrayList<ArrayList<Edge>> edges, 
             int initialState, int[] acceptingStates, Var[] initialVarValues, 
@@ -72,53 +87,66 @@ public class TagMachine {
         this.varMap = varMap;
         this.edges = edges;
         this.initialState = initialState;
-        this.acceptingStates = acceptingStates; // TODO: ordinare ed eliminare doppioni
+        this.acceptingStates = acceptingStates;
         this.initialVarValues = initialVarValues;
         this.tagInstance = tagInstance;        
     }
 
+    /**
+     * Restituisce il mapping variabile.posizione.
+     * @return mapping variabile.posizione
+     */
     public HashMap<String, Integer> getVarMap() {
         return varMap;
     }
 
+    /**
+     * Restituisce le transizioni tra stati.
+     * @return le transizioni tra stati
+     */
     public ArrayList<ArrayList<Edge>> getEdges() {
         return edges;
     }
 
+    /**
+     * Restituisce lo stato iniziale.
+     * @return lo stato iniziale
+     */
     public int getInitialState() {
         return initialState;
     }
 
+    /**
+     * Restituisce gli stati finali.
+     * @return gli stati finali
+     */
     public int[] getAcceptingStates() {
         return acceptingStates;
     }
 
+    /**
+     * Restituisce le variabili iniziali.
+     * @return le variabili iniziali
+     */
     public Var[] getInitialVarValues() {
         return initialVarValues;
     }
 
+    /**
+     * Restituisce l'istanza di tag.
+     * @return l'istanza di tag
+     */
     public Tag getTagInstance() {
         return tagInstance;
     }
     
-    public static ArrayList<String> getSharedVars(Set<String> variables, TagMachine tm){
-        ArrayList<String> sharedVars = new ArrayList<>(tm.getVarMap().size());
-        for(String var : variables){
-            if(tm.getVarMap().get(var) != null){ // variabile presente in tm
-                sharedVars.add(var);
-            }
-        }
-        return sharedVars;
-    }
-    
     /**
-     * Applica il morfismo alla TagMachine. La TagMachine viene modificata senza
-     * restituire nulla.
+     * Applica il morfismo alla tag machine.
+     * Il morfismo viene applicato ad ogni tag piece.
      * 
-     * @param tagMorphism
-     * @throws Exception 
+     * @param tagMorphism morfismo da applicare
+     * @throws Exception se il morfismo non può essere applicato alla tag machine
      */
-    // TODO: si può generare una nuova tag machine
     public void applyMorphism(Morphism tagMorphism) throws Exception {
         if(tagMorphism == null)
             return;
@@ -133,11 +161,11 @@ public class TagMachine {
     }
     
     /**
-     * Esegue una simulazione della TagMachine percorrendo le sue transizioni.
+     * Esegue una simulazione della tag machine percorrendo le sue transizioni.
      * 
-     * @param steps Numero di transizioni da percorrere.
-     * @param random Indica se scegliere la prossima transizione in modo casuale.
-     * @param debug Indica se stampare i messaggi di debug.
+     * @param steps numero di transizioni da percorrere
+     * @param random indica se scegliere la prossima transizione in modo casuale
+     * @param debug indica se stampare i messaggi di debug
      * @throws Exception 
      */
     // TODO: gestire quando c'è un solo stato o nessuno
@@ -229,6 +257,10 @@ public class TagMachine {
         return usedMB;
     }
 
+    /**
+     * Rappresentazione della tag machine come stringa.
+     * @return la stringa che rappresenta la tag machine
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -250,25 +282,15 @@ public class TagMachine {
             sb.append("\n");
         }
         
-        /*
         for(ArrayList<Edge> edgeList : this.edges){
             i=0;
             for(Edge e : edgeList){
                 sb.append(String.format("\n%d: %d -> %d\n", i, e.getFromState(), e.getToState()));
                 i++;
                 
-                for(Map.Entry<String, Integer> entry : this.varMap.entrySet()){
-                    LabelingFunction l = e.getTagPiece().getLabelingFunction(entry.getKey());
-                    
-                    if(l != null)
-                        sb.append(String.format("%s = %s\n", entry.getKey(), l.toString()));
-                    else
-                        sb.append(String.format("%s = -\n", entry.getKey()));
-                }
-                
+                sb.append(e.getTagPiece().toString());
             }
         }
-        */
         
         return sb.toString();
     }

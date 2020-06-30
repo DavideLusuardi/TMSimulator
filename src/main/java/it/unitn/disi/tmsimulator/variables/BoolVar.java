@@ -11,8 +11,16 @@ package it.unitn.disi.tmsimulator.variables;
  * @author davide
  */
 public class BoolVar extends Var {
-    Boolean value;
+    /**
+     * Il valore della variabile.
+     */
+    private Boolean value;
 
+    /**
+     * Costruisce una nuova variabile.
+     * 
+     * @param value il valore della variabile.
+     */
     public BoolVar(Boolean value) {
         this.value = value;
     }

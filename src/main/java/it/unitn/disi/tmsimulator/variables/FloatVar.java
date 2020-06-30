@@ -11,12 +11,25 @@ package it.unitn.disi.tmsimulator.variables;
  * @author davide
  */
 public class FloatVar extends Var {
-    Float value;
+    /**
+     * Il valore della variabile.
+     */
+    private Float value;
 
+    /**
+     * Costruisce una nuova variabile.
+     * 
+     * @param value il valore della variabile.
+     */
     public FloatVar(Float value) {
         this.value = value;
     }
     
+    /**
+     * Costruisce una nuova variabile.
+     * 
+     * @param value il valore della variabile.
+     */
     public FloatVar(Integer value){
         this((float) value);
     }

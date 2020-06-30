@@ -11,17 +11,20 @@ package it.unitn.disi.tmsimulator.tags;
  * 
  * @author davide
  */
-public final class MaxPlusFloat extends Tag {
+public final class FloatTag extends Tag {
     /**
      * Tag epsilon. Corrisponde al valore -infinito.
      */
-    public static final MaxPlusFloat EPSILON = new MaxPlusFloat(Float.NEGATIVE_INFINITY);
+    public static final FloatTag EPSILON = new FloatTag(Float.NEGATIVE_INFINITY);
     
     /**
-     * Tag identità. Corrisponde al valore float 0.
+     * Tag identità. Corrisponde al valore 0.
      */
-    public static final MaxPlusFloat IDENTITY = new MaxPlusFloat((float)0);
+    public static final FloatTag IDENTITY = new FloatTag((float)0);
     
+    /**
+     * Soglia di errore nel confronto tra float.
+     */
     public static float errValue = (float)0.0001;
     
     /**
@@ -29,35 +32,42 @@ public final class MaxPlusFloat extends Tag {
      */
     private Float tag;
     
-    public MaxPlusFloat(Float t){
+    /**
+     * Costruisce un tag.
+     * @param t il valore del tag.
+     */
+    public FloatTag(Float t){
         this.tag = t;
     }
 
-    public MaxPlusFloat() {
+    /**
+     * Costruisce un tag con valore non definito.
+     */
+    public FloatTag() {
     }
 
+    /**
+     * Restituisce il valore del tag.
+     * @return il valore del tag.
+     */
     public Float getTag() {
         return tag;
     }
     
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
      * Corrisponde all'operazione di somma.
-     * Richiede un tag di tipo {@link it.unitn.disi.tmsimulator.tags.MaxPlusFloat}.
-     * 
-     * @param other
-     * @return
-     * @throws Exception 
+     * Richiede un tag di tipo {@link it.unitn.disi.tmsimulator.tags.FloatTag}.
      */
     @Override
     public Tag concatenate(Tag other) throws Exception {
         if(other == null)
             throw new Exception("other = null"); // TODO
-        if(!(other instanceof MaxPlusFloat)){
+        if(!(other instanceof FloatTag)){
             throw new Exception("la concatenazione richiede due tag dello stesso tipo");
         }
 
-        MaxPlusFloat t = new MaxPlusFloat(this.tag + ((MaxPlusFloat) other).tag);
+        FloatTag t = new FloatTag(this.tag + ((FloatTag) other).tag);
         if(this.isEpsilon() || other.isEpsilon())
             t = EPSILON;
         
@@ -66,18 +76,14 @@ public final class MaxPlusFloat extends Tag {
 
     /**
      * Esegue l'operazione &gt; tra tag in base al classico ordinamento dei numeri.
-     * 
-     * @param other
-     * @return
-     * @throws Exception 
      */
     @Override
     public boolean gt(Tag other) throws Exception {
-        if(!(other instanceof MaxPlusFloat)){
+        if(!(other instanceof FloatTag)){
             throw new Exception("la comparazione richiede due tag dello stesso tipo");
         }
         
-        return this.tag > ((MaxPlusFloat) other).tag;
+        return this.tag > ((FloatTag) other).tag;
     }
 
     @Override
@@ -97,7 +103,7 @@ public final class MaxPlusFloat extends Tag {
 
     @Override
     public boolean equals(Tag other) {
-        if(other == null || !(other instanceof MaxPlusFloat))
+        if(other == null || !(other instanceof FloatTag))
             return false;
         
         if(this.isEpsilon()){
@@ -109,7 +115,7 @@ public final class MaxPlusFloat extends Tag {
             if(other.isEpsilon())
                 return false;
             else
-                return Math.abs(this.tag - ((MaxPlusFloat)other).getTag()) < MaxPlusFloat.errValue;
+                return Math.abs(this.tag - ((FloatTag)other).getTag()) < FloatTag.errValue;
         }
         
     }

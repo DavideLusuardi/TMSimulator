@@ -11,41 +11,58 @@ package it.unitn.disi.tmsimulator.tags;
  * 
  * @author davide
  */
-public final class MaxPlusInteger extends Tag {
-    public static final MaxPlusInteger EPSILON = new MaxPlusInteger(Integer.MIN_VALUE);
-    public static final MaxPlusInteger IDENTITY = new MaxPlusInteger(0);
+public final class IntegerTag extends Tag {
+    /**
+     * Tag epsilon. Corrisponde al valore Integer.MIN_VALUE.
+     */
+    public static final IntegerTag EPSILON = new IntegerTag(Integer.MIN_VALUE);
     
+    /**
+     * Tag identità. Corrisponde al valore 0.
+     */
+    public static final IntegerTag IDENTITY = new IntegerTag(0);
+    
+    /**
+     * Valore del tag.
+     */
     private Integer tag;
     
-    public MaxPlusInteger(Integer t){
+    /**
+     * Costruisce un tag.
+     * @param t il valore del tag.
+     */
+    public IntegerTag(Integer t){
         this.tag = t;
     }
 
-    public MaxPlusInteger() {
+    /**
+     * Costruisce un tag con valore non definito.
+     */
+    public IntegerTag() {
     }
 
+    /**
+     * Restituisce il valore del tag.
+     * @return il valore del tag.
+     */
     public Integer getTag() {
         return tag;
     }
     
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
      * Corrisponde all'operazione di somma.
-     * Richiede un tag di tipo {@link it.unitn.disi.tmsimulator.tags.MaxPlusInteger}.
-     * 
-     * @param other
-     * @return
-     * @throws Exception 
+     * Richiede un tag di tipo {@link it.unitn.disi.tmsimulator.tags.IntegerTag}.
      */
     @Override
     public Tag concatenate(Tag other) throws Exception {
         if(other == null)
             throw new Exception("other = null"); // TODO
-        if(!(other instanceof MaxPlusInteger)){
+        if(!(other instanceof IntegerTag)){
             throw new Exception("la concatenazione richiede due tag dello stesso tipo");
         }
 
-        MaxPlusInteger t = new MaxPlusInteger(this.tag + ((MaxPlusInteger) other).tag);
+        IntegerTag t = new IntegerTag(this.tag + ((IntegerTag) other).tag);
         if(this.isEpsilon() || other.isEpsilon())
             t = EPSILON;
         
@@ -54,18 +71,14 @@ public final class MaxPlusInteger extends Tag {
 
     /**
      * Esegue l'operazione &gt; tra tag in base al classico ordinamento dei numeri.
-     * 
-     * @param other
-     * @return
-     * @throws Exception 
      */
     @Override
     public boolean gt(Tag other) throws Exception {
-        if(!(other instanceof MaxPlusInteger)){
+        if(!(other instanceof IntegerTag)){
             throw new Exception("la comparazione richiede due tag dello stesso tipo");
         }
         
-        return this.tag > ((MaxPlusInteger) other).tag;
+        return this.tag > ((IntegerTag) other).tag;
     }
 
     @Override
@@ -85,10 +98,10 @@ public final class MaxPlusInteger extends Tag {
 
     @Override
     public boolean equals(Tag other) {
-        if(other == null || !(other instanceof MaxPlusInteger))
+        if(other == null || !(other instanceof IntegerTag))
             return false;
         
-        return this.tag.equals(((MaxPlusInteger)other).getTag());
+        return this.tag.equals(((IntegerTag)other).getTag());
     }
 
     @Override
