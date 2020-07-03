@@ -5,7 +5,6 @@
  */
 package it.unitn.disi.tmsimulator;
 
-import it.unitn.disi.tmsimulator.labelingfunction.LabelingFunction;
 import it.unitn.disi.tmsimulator.morphism.Morphism;
 import it.unitn.disi.tmsimulator.tags.Tag;
 import it.unitn.disi.tmsimulator.variables.Var;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -93,7 +91,7 @@ public class TagMachine {
     }
 
     /**
-     * Restituisce il mapping variabile.posizione.
+     * Restituisce il mapping variabile-posizione.
      * @return mapping variabile.posizione
      */
     public HashMap<String, Integer> getVarMap() {
