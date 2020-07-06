@@ -420,12 +420,20 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 //        for(int i=0; i<tagVector.length; i++)
 //            tagVector[i] = tagInstance.getIdentity();
                 
+        // array memory = 4*capacity
+//        long capacity = Runtime.getRuntime().freeMemory()/(4+32+4+128)/100;
+//        System.out.println("free memory: "+capacity);
+//        if(capacity > Integer.MAX_VALUE)
+//            capacity = (long)Integer.MAX_VALUE;
         HashMap<String, Boolean> unifiableTpMap = new HashMap<>();
         HashMap<String, TagPiece> tpMap = new HashMap<>();                
         
         // visitiamo le TM in parallelo verificando che la transizione sia unificabile
         for(int step=0; step<steps; step++){
             boolean exhausted = false;
+            
+            if(step%10==0)
+                System.out.println("step: "+step);
             
             // inizializziamo currentEdge con la tupla corrispondente alla prima transizione di ogni TM
             ArrayList<Integer> currentEdge = new ArrayList<>(this.size());
@@ -496,6 +504,14 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                         }
                     }
                     
+                    int size = unifiableTpMap.keySet().size();
+                    while(unifiableTpMap.size() >= 150000){
+//                    while(Runtime.getRuntime().freeMemory() < 1024*1024*10 && !unifiableTpMap.keySet().isEmpty()){
+//                        unifiableTpMap.remove(unifiableTpMap.keySet().iterator().next());
+                        unifiableTpMap.clear();
+                    }
+//                    if(unifiableTpMap.keySet().size() != size)
+//                        System.out.println(String.format("before %d, after %d", size, unifiableTpMap.keySet().size()));
                     unifiableTpMap.put(transitionId.toString(), unifiable);
 //                    tpMap.put(transitionId.toString(), tpComp);
                 }

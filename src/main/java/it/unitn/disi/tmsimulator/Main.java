@@ -624,6 +624,28 @@ public class Main {
         }
     }
     
+    public void runSimulation2() throws Exception {
+        TagMachineSet tmSet = new TagMachineSet();
+        for (int i = 0; i < 5; i++) {
+            tmSet.add(generateFullyConnectedTM());
+        }
+
+        System.out.println("start simulation ");
+
+        int numSteps = 500;
+        long startTime = System.nanoTime();
+        long usedByte;
+
+        usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, true);
+
+        double executionTime = (System.nanoTime() - startTime)/1000000000.0;
+        int numTms = tmSet.size();
+        int numStates = (int) Math.pow(NUM_STATES, numTms);
+        int numTrans = (int) Math.pow(NUM_STATES * NUM_STATES, numTms);
+        
+        System.out.println("execution time: "+executionTime+"\nused memory: "+usedByte);
+    }
+    
     public TagMachine generateTank() throws Exception {
         Tag zero = new FloatTag((float)0.0);
         Tag zp5 = new FloatTag((float)0.5);
@@ -895,8 +917,9 @@ public class Main {
         Main m = new Main();
 //        m.runExampleEterPaper();
 //        m.runExample1();
-        m.runExpExample();
+//        m.runExpExample();
 //        m.runTankExample();
 //        m.runCaldaiaExample();
+        m.runSimulation2();
     }
 }
