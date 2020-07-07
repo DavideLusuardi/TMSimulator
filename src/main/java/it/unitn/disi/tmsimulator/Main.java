@@ -474,7 +474,7 @@ public class Main {
     int NUM_STATES = 4;
     int NUM_TM = 4;
     int NUM_STEPS = 100;
-    boolean RND = false;
+    boolean RND = true;
     
     public TagMachine generateFullyConnectedTM() throws Exception {                
         String[] variables = new String[NUM_VARS];        
@@ -519,9 +519,8 @@ public class Main {
         return tm;
     }
     
-    public void runExpExample() throws Exception {        
-        
-        String[] simulationName = {"static_composition", "dynamic_composition", "dynamic_composition2"};
+    String[] simulationName = {"static_composition", "dynamic_composition", "dynamic_composition2"};
+    public void runExpExample() throws Exception {                
         
         for(int z=0; z<simulationName.length; z++){
             String sn = simulationName[z];
@@ -530,7 +529,7 @@ public class Main {
                 resultsFile = new FileWriter(String.format("plots/%s_rnd.csv", sn));
             else
                 resultsFile = new FileWriter(String.format("plots/%s.csv", sn));
-            resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
+            resultsFile.write("#tm, #states, #transitions, steps, time(s), memory(MB)\n");
 
             try{
                 for(int j=0; j<6; j++){
@@ -563,12 +562,13 @@ public class Main {
                             break;
                     }
 
-                    long executionTime = System.nanoTime()-startTime;                
+                    double usedMB = usedByte / (double) (1024*1024);
+                    double executionTime = (System.nanoTime()-startTime) / 1000000000.0;
                     int numTms = tmSet.size();
                     int numStates = (int) Math.pow(NUM_STATES, numTms);
                     int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
 
-                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedByte+"\n");
+                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedMB+"\n");
                 }
             } catch(Exception e) {                
             } finally {
@@ -576,63 +576,71 @@ public class Main {
             }
             
             
-//            if(RND)
-//                resultsFile = new FileWriter(String.format("plots/%s_rnd_steps.csv", sn));
-//            else
-//                resultsFile = new FileWriter(String.format("plots/%s_steps.csv", sn));
-//            resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
-//
-//            try{
-//                for(int j=0; j<10; j++){
-//                    System.gc();
-//
-//                    TagMachineSet tmSet = new TagMachineSet();
-//                    for(int i=0; i<NUM_TM; i++){
-//                        tmSet.add(generateFullyConnectedTM());
-//                    }
-//
-//                    System.out.println(sn+" steps - start simulation "+j);
-//
-//                    int numSteps = NUM_STEPS*(j+1);                
-//                    long startTime = System.nanoTime();
-//                    long usedByte;
-//                            
-//                    switch (z) {
-//                        case 0:
-//                            TagMachine tmComp = tmSet.compose();
-//                            usedByte = tmComp.simulate(numSteps, RND, false);
-//                            break;
-//                        case 1:
-//                            usedByte = tmSet.simulate(numSteps, RND);                                    
-//                            break;
-//                        default:
-//                            usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, RND);
-//                            break;
-//                    }
-//                    
-//                    long executionTime = System.nanoTime()-startTime;                
-//                    int numTms = tmSet.size();
-//                    int numStates = (int) Math.pow(NUM_STATES, numTms);
-//                    int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
-//
-//                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedByte+"\n");
-//                }
-//            } catch(Exception e) {
-//            } finally {
-//                resultsFile.close();
-//            }
+            if(RND)
+                resultsFile = new FileWriter(String.format("plots/%s_rnd_steps.csv", sn));
+            else
+                resultsFile = new FileWriter(String.format("plots/%s_steps.csv", sn));
+            resultsFile.write("#tm, #states, #transitions, steps, time(s), memory(MB)\n");
+
+            try{
+                System.gc();
+
+                TagMachineSet tmSet = new TagMachineSet();
+                for(int i=0; i<NUM_TM; i++){
+                    tmSet.add(generateFullyConnectedTM());
+                }
+
+                System.out.println(sn+" steps - start simulation ");
+
+                int numSteps = 10000;                
+                long startTime = System.nanoTime();
+                long usedByte;
+                ArrayList<ArrayList<Object>> results;
+
+                switch (z) {
+                    case 0:
+                        TagMachine tmComp = tmSet.compose();
+                        tmComp.startTime = startTime;
+                        usedByte = tmComp.simulate(numSteps, RND, false);
+                        results = tmComp.results;
+                        break;
+                    case 1:
+                        usedByte = tmSet.simulate(numSteps, RND);      
+                        results = tmSet.results;
+                        break;
+                    default:
+                        usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, RND);
+                        results = tmSet.results;
+                        break;
+                }
+
+                int numTms = tmSet.size();
+                int numStates = (int) Math.pow(NUM_STATES, numTms);
+                int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
+                
+                for(ArrayList<Object> entry : results){
+                    int steps = (int) entry.get(0);
+                    double executionTime = ((long) entry.get(1)) / 1000000000.0;
+                    double usedMB = ((long) entry.get(2)) / (double)(1024*1024);
+                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+steps+", "+executionTime+", "+usedMB+"\n");
+                }                    
+
+            } catch(Exception e) {
+            } finally {
+                resultsFile.close();
+            }
         }
     }
     
     public void runSimulation2() throws Exception {
         TagMachineSet tmSet = new TagMachineSet();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             tmSet.add(generateFullyConnectedTM());
         }
 
         System.out.println("start simulation ");
 
-        int numSteps = 500;
+        int numSteps = 100;
         long startTime = System.nanoTime();
         long usedByte;
 
@@ -752,36 +760,68 @@ public class Main {
     }
     
     public void runTankExample() throws Exception {
-        TagMachine tankTM = generateTank();
-        TagMachine tankControllerTM = generateTankController();
         
-        TagMachineSet tmSet = new TagMachineSet();
-        tmSet.add(tankTM);
-        tmSet.add(tankControllerTM);
-        
-        ArrayList<Morphism> mm = new ArrayList<>();        
-        Morphism m = new Morphism() {
-            @Override
-            public Tag map(Tag tag) throws Exception {
-                if(tag.isEpsilon())
-                    return getTagInstance().getEpsilon();
-                else
-                    return new FloatTag(((float)0.5) * ((IntegerTag) tag).getTag());
-            }
+        for(int z=0; z<simulationName.length; z++){
+            String sn = simulationName[z];
+            FileWriter resultsFile = new FileWriter(String.format("plots/tank_results_%s.csv", sn));
+            resultsFile.write("steps, time(s), memory(MB)\n");
 
-            @Override
-            public Tag getTagInstance() {
-                return new FloatTag();
+            TagMachine tankTM = generateTank();
+            TagMachine tankControllerTM = generateTankController();
+
+            TagMachineSet tmSet = new TagMachineSet();
+            tmSet.add(tankTM);
+            tmSet.add(tankControllerTM);
+
+            ArrayList<Morphism> mm = new ArrayList<>();        
+            Morphism m = new Morphism() {
+                @Override
+                public Tag map(Tag tag) throws Exception {
+                    if(tag.isEpsilon())
+                        return getTagInstance().getEpsilon();
+                    else
+                        return new FloatTag(((float)0.5) * ((IntegerTag) tag).getTag());
+                }
+
+                @Override
+                public Tag getTagInstance() {
+                    return new FloatTag();
+                }
+            };
+            mm.add(null);
+            mm.add(m);
+
+            System.gc();
+            int numSteps = 10000;
+            long usedByte;
+            ArrayList<ArrayList<Object>> results;
+            
+            long startTime = System.nanoTime();
+            
+            switch (z) {
+                case 0:
+                    TagMachine tmComp = tmSet.compose();
+                    tmComp.startTime = startTime;
+                    usedByte = tmComp.simulate(numSteps, true, false);
+                    results = tmComp.results;
+                    break;
+                case 1:
+                    usedByte = tmSet.simulate(numSteps, true);
+                    results = tmSet.results;
+                    break;
+                default:
+                    usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, true);
+                    results = tmSet.results;
+                    break;
             }
-        };
-        mm.add(null);
-        mm.add(m);
-        
-        TagMachine tmComp = tmSet.compose(mm);
-        System.out.println("TMcomposition --------------------------------------");
-        System.out.println(tmComp);
-        System.out.println("run of tmComp");
-        tmComp.simulate(10, false, true);
+            
+            for (ArrayList<Object> entry : results) {
+                int steps = (int) entry.get(0);
+                double executionTime = ((long) entry.get(1)) / 1000000000.0;
+                double usedMB = ((long) entry.get(2)) / (double) (1024 * 1024);
+                resultsFile.write(steps + ", " + executionTime + ", " + usedMB + "\n");
+            }
+        }
     }
     
     public TagMachine generateCaldaiaTM() throws Exception {
@@ -917,8 +957,8 @@ public class Main {
         Main m = new Main();
 //        m.runExampleEterPaper();
 //        m.runExample1();
-        m.runExpExample();
-//        m.runTankExample();
+//        m.runExpExample();
+        m.runTankExample();
 //        m.runCaldaiaExample();
 //        m.runSimulation2();
     }

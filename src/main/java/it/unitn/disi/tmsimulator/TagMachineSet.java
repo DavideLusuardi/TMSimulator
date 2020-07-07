@@ -178,6 +178,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         return tmComp;
     }
     
+    public int stepRange = 10;
+    public ArrayList<ArrayList<Object>> results;
     
     // TODO: controllare che le TMs abbiano dimensione > 0
     public long simulate(ArrayList<Morphism> tagMorphismList, Tag tagInstance, int steps, boolean random) throws Exception {
@@ -185,6 +187,9 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         FileWriter xFile = new FileWriter("plots/x_without_control.txt");
         FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
         
+        Runtime rt = Runtime.getRuntime();
+        results = new ArrayList<>(steps/stepRange);
+        long startTime = System.nanoTime();
         
         boolean eterComposition = (tagMorphismList != null);
         
@@ -237,6 +242,14 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         // visitiamo le TM in parallelo verificando che la transizione sia unificabile
         for(int step=0; step<steps; step++){
             boolean exhausted = false;
+            
+            if(step % stepRange == 0){
+                ArrayList<Object> entry = new ArrayList<>();
+                entry.add(step);
+                entry.add(System.nanoTime()-startTime);
+                entry.add(rt.totalMemory() - rt.freeMemory());
+                results.add(entry);
+            }
             
             // inizializziamo currentEdge con la tupla corrispondente alla prima transizione di ogni TM
             ArrayList<Integer> currentEdge = new ArrayList<>(this.size());
@@ -359,13 +372,16 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         awFile.close();
         
 //        System.gc();
-        Runtime rt = Runtime.getRuntime();
-        long usedMB = (rt.totalMemory() - rt.freeMemory());
-        return usedMB;
+        long usedByte = (rt.totalMemory() - rt.freeMemory());
+        return usedByte;
     }
     
     public long simulate2(ArrayList<Morphism> tagMorphismList, Tag tagInstance, int steps, boolean random) throws Exception {
         Scanner scan = new Scanner(System.in);
+        
+        Runtime rt = Runtime.getRuntime();
+        results = new ArrayList<>(steps/stepRange);
+        long startTime = System.nanoTime();
         
         boolean eterComposition = (tagMorphismList != null);
         
@@ -416,7 +432,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             varValues.add(vv);
         }
         
-//        Tag[] tagVector = new Tag[varMap.get(varMap.size()-1).size()];
+//        Tag[] tagVector = new Tag[varMap.size()];
 //        for(int i=0; i<tagVector.length; i++)
 //            tagVector[i] = tagInstance.getIdentity();
                 
@@ -426,14 +442,19 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 //        if(capacity > Integer.MAX_VALUE)
 //            capacity = (long)Integer.MAX_VALUE;
         HashMap<String, Boolean> unifiableTpMap = new HashMap<>();
-        HashMap<String, TagPiece> tpMap = new HashMap<>();                
+//        HashMap<String, TagPiece> tpMap = new HashMap<>();                
         
         // visitiamo le TM in parallelo verificando che la transizione sia unificabile
         for(int step=0; step<steps; step++){
             boolean exhausted = false;
             
-//            if(step%10==0)
-//                System.out.println("step: "+step);
+            if(step % stepRange == 0){
+                ArrayList<Object> entry = new ArrayList<>();
+                entry.add(step);
+                entry.add(System.nanoTime()-startTime);
+                entry.add(rt.totalMemory() - rt.freeMemory());
+                results.add(entry);
+            }
             
             // inizializziamo currentEdge con la tupla corrispondente alla prima transizione di ogni TM
             ArrayList<Integer> currentEdge = new ArrayList<>(this.size());
@@ -453,21 +474,13 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             // consideriamo ogni combinazione di transizioni
             while(!exhausted){
                 String transitionId=currentEdge.toString()+currentState.toString();
-//                for(Integer e : currentEdge){
-//                    transitionId += e+",";
-//                }
-//                for (Integer s : currentState) {
-//                    transitionId += s + ",";
-//                }
-//                transitionId += stateId;                
-                
                 
                 // controlliamo che i tag piece siano unificabili    
                 boolean unifiable = true;
                 if(unifiableTpMap.get(transitionId)!=null){
                     unifiable = unifiableTpMap.get(transitionId);
                     
-                } else {                    
+                } else {
                     Tag[][] matrixComp = new Tag[varMap.size()][varMap.size()];
                     for (int i = 0; i < matrixComp.length; i++) {
                         for (int j = 0; j < matrixComp.length; j++) {
@@ -504,20 +517,16 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                     
 //                    if(unifiableTpMap.size() % 100000 == 0)
 //                        System.out.println(unifiableTpMap.size());
-//                    if(unifiableTpMap.size() >= 1000000000){
-//                        System.out.println("clear");
-//                        Runtime.getRuntime().gc();
-//                        System.out.println("free memory: "+Runtime.getRuntime().freeMemory());
-//                    while(Runtime.getRuntime().freeMemory() < 1024*1024*10 && !unifiableTpMap.keySet().isEmpty()){
-//                        unifiableTpMap.remove(unifiableTpMap.keySet().iterator().next());
+
+                    int freeMemThr = 1024*1024*10;
+                    if(Runtime.getRuntime().freeMemory() < freeMemThr && !unifiableTpMap.keySet().isEmpty()){
+                        unifiableTpMap.remove(unifiableTpMap.keySet().iterator().next());
 //                        unifiableTpMap.clear();
-//                    }
-//                    if(unifiableTpMap.keySet().size() != size)
-//                        System.out.println(String.format("before %d, after %d", size, unifiableTpMap.keySet().size()));
+                    }
                     unifiableTpMap.put(transitionId, unifiable);
-//                    tpMap.put(transitionId.toString(), tpComp);
+//                    tpMap.put(transitionId, tpComp);
                 }
-//                tpCompEdges.add(tpMap.get(transitionId.toString()));
+//                tpCompEdges.add(tpMap.get(transitionId));
                 
                 // controlliamo che le labeling function siano unificabili
                 if(unifiable){
@@ -588,9 +597,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         }
 
 //        System.gc();
-        Runtime rt = Runtime.getRuntime();
-        long usedMB = (rt.totalMemory() - rt.freeMemory());
-        return usedMB;
+        long usedByte = (rt.totalMemory() - rt.freeMemory());
+        return usedByte;
     }
     
     public long simulate(int steps, boolean random) throws Exception {

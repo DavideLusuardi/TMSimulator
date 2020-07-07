@@ -158,6 +158,9 @@ public class TagMachine {
         }
     }
     
+    public long startTime;
+    public int stepRange = 10;
+    public ArrayList<ArrayList<Object>> results;
     /**
      * Esegue una simulazione della tag machine percorrendo le sue transizioni.
      * 
@@ -173,6 +176,9 @@ public class TagMachine {
         FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
         FileWriter oFile = new FileWriter("output.txt");
         
+        Runtime rt = Runtime.getRuntime();
+        results = new ArrayList<>(steps/stepRange);
+        
         Tag[] tagVector = new Tag[varMap.size()];        
         for(int i=0; i<varMap.size(); i++){
             tagVector[i] = tagInstance.getIdentity();
@@ -184,7 +190,15 @@ public class TagMachine {
         }
         
         int state=initialState;
-        for(int i=0; i<steps; i++){
+        for(int step=0; step<steps; step++){
+            
+            if(step % stepRange == 0){
+                ArrayList<Object> entry = new ArrayList<>();
+                entry.add(step);
+                entry.add(System.nanoTime()-startTime);
+                entry.add(rt.totalMemory() - rt.freeMemory());
+                results.add(entry);
+            }
             
             ArrayList<Integer> nextStateIndexes = new ArrayList<>(edges.get(state).size());
             for(int j=0; j<edges.get(state).size(); j++){
@@ -250,9 +264,8 @@ public class TagMachine {
         oFile.close();
         
 //        System.gc();
-        Runtime rt = Runtime.getRuntime();
-        long usedMB = (rt.totalMemory() - rt.freeMemory());
-        return usedMB;
+        long usedByte = (rt.totalMemory() - rt.freeMemory());
+        return usedByte;
     }
 
     /**

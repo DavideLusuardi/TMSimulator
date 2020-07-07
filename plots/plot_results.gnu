@@ -1,5 +1,5 @@
 set term postscript font 15 enhanced color
-set output "results.eps"
+set output "results_4.eps"
 
 set title "memory usage"
 set xlabel "number of tag machines"
