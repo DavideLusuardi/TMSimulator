@@ -432,8 +432,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         for(int step=0; step<steps; step++){
             boolean exhausted = false;
             
-            if(step%10==0)
-                System.out.println("step: "+step);
+//            if(step%10==0)
+//                System.out.println("step: "+step);
             
             // inizializziamo currentEdge con la tupla corrispondente alla prima transizione di ogni TM
             ArrayList<Integer> currentEdge = new ArrayList<>(this.size());
@@ -445,8 +445,6 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 currentEdge.add(0);
             }
             
-            StringBuilder transitionId = new StringBuilder(this.size()*2);
-            
             // salviamo le transizioni unificabili ed i valori delle variabili calcolati
             ArrayList<ArrayList<Integer>> validEdges = new ArrayList<>();
             ArrayList<ArrayList<HashMap<String, Var>>> varValuesPrime = new ArrayList<>();
@@ -454,20 +452,20 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             
             // consideriamo ogni combinazione di transizioni
             while(!exhausted){
-
-                for(Integer s : currentState){
-                    transitionId.append(s);
-                    transitionId.append(",");
-                }
-                for(Integer e : currentEdge){
-                    transitionId.append(e);
-                    transitionId.append(",");
-                }
+                String transitionId=currentEdge.toString()+currentState.toString();
+//                for(Integer e : currentEdge){
+//                    transitionId += e+",";
+//                }
+//                for (Integer s : currentState) {
+//                    transitionId += s + ",";
+//                }
+//                transitionId += stateId;                
+                
                 
                 // controlliamo che i tag piece siano unificabili    
                 boolean unifiable = true;
-                if(unifiableTpMap.get(transitionId.toString())!=null){
-                    unifiable = unifiableTpMap.get(transitionId.toString());
+                if(unifiableTpMap.get(transitionId)!=null){
+                    unifiable = unifiableTpMap.get(transitionId);
                     
                 } else {                    
                     Tag[][] matrixComp = new Tag[varMap.size()][varMap.size()];
@@ -504,15 +502,19 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                         }
                     }
                     
-                    int size = unifiableTpMap.keySet().size();
-                    while(unifiableTpMap.size() >= 150000){
+//                    if(unifiableTpMap.size() % 100000 == 0)
+//                        System.out.println(unifiableTpMap.size());
+//                    if(unifiableTpMap.size() >= 1000000000){
+//                        System.out.println("clear");
+//                        Runtime.getRuntime().gc();
+//                        System.out.println("free memory: "+Runtime.getRuntime().freeMemory());
 //                    while(Runtime.getRuntime().freeMemory() < 1024*1024*10 && !unifiableTpMap.keySet().isEmpty()){
 //                        unifiableTpMap.remove(unifiableTpMap.keySet().iterator().next());
-                        unifiableTpMap.clear();
-                    }
+//                        unifiableTpMap.clear();
+//                    }
 //                    if(unifiableTpMap.keySet().size() != size)
 //                        System.out.println(String.format("before %d, after %d", size, unifiableTpMap.keySet().size()));
-                    unifiableTpMap.put(transitionId.toString(), unifiable);
+                    unifiableTpMap.put(transitionId, unifiable);
 //                    tpMap.put(transitionId.toString(), tpComp);
                 }
 //                tpCompEdges.add(tpMap.get(transitionId.toString()));

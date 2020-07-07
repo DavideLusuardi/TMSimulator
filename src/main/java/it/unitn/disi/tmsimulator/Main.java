@@ -536,7 +536,7 @@ public class Main {
                 for(int j=0; j<6; j++){
                     System.gc();
                     
-                    if((z==0 && j>=4) || (z==2 && (j>=5 || j>=4 && RND)))
+                    if((z==0 && j>=4))
                         continue;
                         
                     TagMachineSet tmSet = new TagMachineSet();
@@ -576,51 +576,51 @@ public class Main {
             }
             
             
-            if(RND)
-                resultsFile = new FileWriter(String.format("plots/%s_rnd_steps.csv", sn));
-            else
-                resultsFile = new FileWriter(String.format("plots/%s_steps.csv", sn));
-            resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
-
-            try{
-                for(int j=0; j<10; j++){
-                    System.gc();
-
-                    TagMachineSet tmSet = new TagMachineSet();
-                    for(int i=0; i<NUM_TM; i++){
-                        tmSet.add(generateFullyConnectedTM());
-                    }
-
-                    System.out.println(sn+" steps - start simulation "+j);
-
-                    int numSteps = NUM_STEPS*(j+1);                
-                    long startTime = System.nanoTime();
-                    long usedByte;
-                            
-                    switch (z) {
-                        case 0:
-                            TagMachine tmComp = tmSet.compose();
-                            usedByte = tmComp.simulate(numSteps, RND, false);
-                            break;
-                        case 1:
-                            usedByte = tmSet.simulate(numSteps, RND);                                    
-                            break;
-                        default:
-                            usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, RND);
-                            break;
-                    }
-                    
-                    long executionTime = System.nanoTime()-startTime;                
-                    int numTms = tmSet.size();
-                    int numStates = (int) Math.pow(NUM_STATES, numTms);
-                    int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
-
-                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedByte+"\n");
-                }
-            } catch(Exception e) {
-            } finally {
-                resultsFile.close();
-            }
+//            if(RND)
+//                resultsFile = new FileWriter(String.format("plots/%s_rnd_steps.csv", sn));
+//            else
+//                resultsFile = new FileWriter(String.format("plots/%s_steps.csv", sn));
+//            resultsFile.write("#tm, #states, #transitions, steps, time(ns), memory(byte)\n");
+//
+//            try{
+//                for(int j=0; j<10; j++){
+//                    System.gc();
+//
+//                    TagMachineSet tmSet = new TagMachineSet();
+//                    for(int i=0; i<NUM_TM; i++){
+//                        tmSet.add(generateFullyConnectedTM());
+//                    }
+//
+//                    System.out.println(sn+" steps - start simulation "+j);
+//
+//                    int numSteps = NUM_STEPS*(j+1);                
+//                    long startTime = System.nanoTime();
+//                    long usedByte;
+//                            
+//                    switch (z) {
+//                        case 0:
+//                            TagMachine tmComp = tmSet.compose();
+//                            usedByte = tmComp.simulate(numSteps, RND, false);
+//                            break;
+//                        case 1:
+//                            usedByte = tmSet.simulate(numSteps, RND);                                    
+//                            break;
+//                        default:
+//                            usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, RND);
+//                            break;
+//                    }
+//                    
+//                    long executionTime = System.nanoTime()-startTime;                
+//                    int numTms = tmSet.size();
+//                    int numStates = (int) Math.pow(NUM_STATES, numTms);
+//                    int numTrans = (int) Math.pow(NUM_STATES*NUM_STATES, numTms);
+//
+//                    resultsFile.write(numTms+", "+numStates+", "+numTrans+", "+numSteps+", "+executionTime+", "+usedByte+"\n");
+//                }
+//            } catch(Exception e) {
+//            } finally {
+//                resultsFile.close();
+//            }
         }
     }
     
@@ -917,9 +917,9 @@ public class Main {
         Main m = new Main();
 //        m.runExampleEterPaper();
 //        m.runExample1();
-//        m.runExpExample();
+        m.runExpExample();
 //        m.runTankExample();
 //        m.runCaldaiaExample();
-        m.runSimulation2();
+//        m.runSimulation2();
     }
 }
