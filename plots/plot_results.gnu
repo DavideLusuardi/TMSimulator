@@ -3,7 +3,7 @@ set output "results_4.eps"
 
 set title "memory usage"
 set xlabel "number of tag machines"
-set ylabel "memory [byte]"
+set ylabel "memory [MB]"
 #set xrange [-30:40]
 #set yrange [-30:40]
 #set key font ",14"
@@ -13,7 +13,7 @@ plot "static_composition.csv"   using 1:6 with lines linewidth 2 linecolor rgb "
 
 set title "execution time"
 set xlabel "number of tag machines"
-set ylabel "time [ns]"
+set ylabel "time [s]"
 #set xrange [-30:40]
 #set yrange [-30:40]
 #set key font ",14"
@@ -24,7 +24,7 @@ plot "static_composition.csv"   using 1:5 with lines linewidth 2 linecolor rgb "
 
 set title "execution time (4 TM)"
 set xlabel "number of steps"
-set ylabel "time [ns]"
+set ylabel "time [s]"
 #set xrange [-30:40]
 #set yrange [-30:40]
 #set key font ",14"
@@ -36,7 +36,7 @@ plot "static_composition_steps.csv"   using 4:5 with lines linewidth 2 linecolor
 
 set title "memory usage (RND)"
 set xlabel "number of tag machines"
-set ylabel "memory [byte]"
+set ylabel "memory [MB]"
 #set xrange [-30:40]
 #set yrange [-30:40]
 #set key font ",14"
@@ -46,7 +46,7 @@ plot "static_composition_rnd.csv"   using 1:6 with lines linewidth 2 linecolor r
 
 set title "execution time (RND)"
 set xlabel "number of tag machines"
-set ylabel "time [ns]"
+set ylabel "time [s]"
 #set xrange [-30:40]
 #set yrange [-30:40]
 #set key font ",14"
@@ -57,7 +57,7 @@ plot "static_composition_rnd.csv"   using 1:5 with lines linewidth 2 linecolor r
 
 set title "execution time (4 TM, RND)"
 set xlabel "number of steps"
-set ylabel "time [ns]"
+set ylabel "time [s]"
 #set xrange [-30:40]
 #set yrange [-30:40]
 #set key font ",14"

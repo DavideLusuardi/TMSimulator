@@ -27,6 +27,8 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class TagMachineSet extends ArrayList<TagMachine> {
     
+    public static int MAX_SIZE = 2000000;
+    
     /**
      * Esegue la composizione omogenea di due tag machine (composizione binaria).
      * 
@@ -519,7 +521,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 //                        System.out.println(unifiableTpMap.size());
 
                     int freeMemThr = 1024*1024*10;
-                    if(Runtime.getRuntime().freeMemory() < freeMemThr && !unifiableTpMap.keySet().isEmpty()){
+//                    if(Runtime.getRuntime().freeMemory() < freeMemThr && !unifiableTpMap.keySet().isEmpty()){
+                    if(unifiableTpMap.size() > MAX_SIZE){
                         unifiableTpMap.remove(unifiableTpMap.keySet().iterator().next());
 //                        unifiableTpMap.clear();
                     }
