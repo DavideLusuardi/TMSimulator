@@ -274,7 +274,7 @@ public class TagPiece {
      * @return i nuovi valori delle variabili calcolati.
      */
     public HashMap<String, Var> applyLabelingFunction(HashMap<String, Var> varValues){
-        HashMap<String, Var> varValuesPrime = new HashMap<>(varValues);
+        HashMap<String, Var> varValuesPrime = new HashMap<>(varValues.size());
         
         for(Map.Entry<String, Integer> entry : this.varMap.entrySet()){
             Var v;

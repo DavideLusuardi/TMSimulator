@@ -470,7 +470,7 @@ public class Main {
             mm.add(m);            
 
             System.gc();
-            int numSteps = 10001;
+            int numSteps = 1000001;
             long usedByte;
             ArrayList<ArrayList<Object>> results;
             
@@ -481,15 +481,15 @@ public class Main {
                 case 0:
                     TagMachine tmComp = tmSet.compose(mm);
                     tmComp.startTime = startTime;
-                    usedByte = tmComp.simulate(numSteps, true, false);
+                    usedByte = tmComp.simulate(numSteps, RND, false);
                     results = tmComp.results;
                     break;
                 case 1:
-                    usedByte = tmSet.simulate(mm, m.getTagInstance(), numSteps, false);
+                    usedByte = tmSet.simulate(mm, m.getTagInstance(), numSteps, RND);
                     results = tmSet.results;
                     break;
                 default:
-                    usedByte = tmSet.simulate2(mm, m.getTagInstance(), numSteps, true);
+                    usedByte = tmSet.simulate2(mm, m.getTagInstance(), numSteps, RND);
                     results = tmSet.results;
                     break;
             }
@@ -509,7 +509,7 @@ public class Main {
     int NUM_STATES = 4;
     int NUM_TM = 4;
     int NUM_STEPS = 100;
-    boolean RND = true;
+    boolean RND = false;
     
     public TagMachine generateFullyConnectedTM() throws Exception {                
         String[] variables = new String[NUM_VARS];        
@@ -837,15 +837,15 @@ public class Main {
                 case 0:
                     TagMachine tmComp = tmSet.compose(mm);
                     tmComp.startTime = startTime;
-                    usedByte = tmComp.simulate(numSteps, true, false);
+                    usedByte = tmComp.simulate(numSteps, RND, false);
                     results = tmComp.results;
                     break;
                 case 1:
-                    usedByte = tmSet.simulate(mm, new FloatTag(), numSteps, true);
+                    usedByte = tmSet.simulate(mm, new FloatTag(), numSteps, RND);
                     results = tmSet.results;
                     break;
                 default:
-                    usedByte = tmSet.simulate2(mm, new FloatTag(), numSteps, true);
+                    usedByte = tmSet.simulate2(mm, new FloatTag(), numSteps, RND);
                     results = tmSet.results;
                     break;
             }
@@ -992,10 +992,10 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-        m.runExampleEterPaper();
+//        m.runExampleEterPaper();
 //        m.runExample1();
 //        m.runExpExample();
-//        m.runTankExample();
+        m.runTankExample();
 //        m.runCaldaiaExample();
 //        m.runSimulation2();
     }
