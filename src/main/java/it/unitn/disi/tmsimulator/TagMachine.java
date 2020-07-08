@@ -159,7 +159,7 @@ public class TagMachine {
     }
     
     public long startTime;
-    public int stepRange = 10;
+    public int stepRange = 1000;
     public ArrayList<ArrayList<Object>> results;
     /**
      * Esegue una simulazione della tag machine percorrendo le sue transizioni.

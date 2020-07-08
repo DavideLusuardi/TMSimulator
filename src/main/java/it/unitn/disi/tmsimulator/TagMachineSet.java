@@ -178,7 +178,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         return tmComp;
     }
     
-    public int stepRange = 10;
+    public int stepRange = 1000;
     public ArrayList<ArrayList<Object>> results;
     
     // TODO: controllare che le TMs abbiano dimensione > 0

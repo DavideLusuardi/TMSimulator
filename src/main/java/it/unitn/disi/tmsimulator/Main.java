@@ -433,41 +433,76 @@ public class Main {
         return tm;        
     }
     
-    public void runExampleEterPaper() throws Exception {        
-        TagMachine tmTorque = generateTorqueTMPaper();
-        TagMachine tmControl = generateControlTMPaper();
-        TagMachine tmPiston1 = generatePiston1TMPaper();
+    public void runExampleEterPaper() throws Exception {
         
-        ArrayList<Morphism> mm = new ArrayList<>();        
-        Morphism m = new Morphism() {
-            @Override
-            public Tag map(Tag tag) throws Exception {
-                if(tag.isEpsilon())
-                    return getTagInstance().getEpsilon();
-                else
-                    return new FloatTag(((float)0.0011810) * ((IntegerTag) tag).getTag());
-            }
+        for(int z=0; z<simulationName.length; z++){
+            String sn = simulationName[z];
+            FileWriter resultsFile = new FileWriter(String.format("plots/automotive_results_%s.csv", sn));
+            resultsFile.write("steps, time(s), memory(MB)\n");
 
-            @Override
-            public Tag getTagInstance() {
-                return new FloatTag();
+            TagMachine tmTorque = generateTorqueTMPaper();
+            TagMachine tmControl = generateControlTMPaper();
+            TagMachine tmPiston1 = generatePiston1TMPaper();
+            
+            TagMachineSet tmSet = new TagMachineSet();
+            tmSet.add(tmTorque);
+            tmSet.add(tmControl);
+            tmSet.add(tmPiston1);
+
+            ArrayList<Morphism> mm = new ArrayList<>();
+            Morphism m = new Morphism() {
+                @Override
+                public Tag map(Tag tag) throws Exception {
+                    if (tag.isEpsilon()) {
+                        return getTagInstance().getEpsilon();
+                    } else {
+                        return new FloatTag(((float) 0.0011810) * ((IntegerTag) tag).getTag());
+                    }
+                }
+
+                @Override
+                public Tag getTagInstance() {
+                    return new FloatTag();
+                }
+            };
+            mm.add(null);
+            mm.add(null);
+            mm.add(m);            
+
+            System.gc();
+            int numSteps = 10001;
+            long usedByte;
+            ArrayList<ArrayList<Object>> results;
+            
+            System.out.println("start simulation");
+            long startTime = System.nanoTime();
+            
+            switch (z) {
+                case 0:
+                    TagMachine tmComp = tmSet.compose(mm);
+                    tmComp.startTime = startTime;
+                    usedByte = tmComp.simulate(numSteps, true, false);
+                    results = tmComp.results;
+                    break;
+                case 1:
+                    usedByte = tmSet.simulate(mm, m.getTagInstance(), numSteps, false);
+                    results = tmSet.results;
+                    break;
+                default:
+                    usedByte = tmSet.simulate2(mm, m.getTagInstance(), numSteps, true);
+                    results = tmSet.results;
+                    break;
             }
-        };        
-        mm.add(null);
-//        mm.add(null);
-        mm.add(m);
-        
-        TagMachineSet tmSet = new TagMachineSet();
-        tmSet.add(tmTorque);        
-//        tmSet.add(tmControl);
-        tmSet.add(tmPiston1);
-//        TagMachine tmComp = tmSet.compose(mm);
-//        System.out.println("TMcomposition --------------------------------------");
-//        System.out.println(tmComp);
-//        System.out.println("run of tmComp");
-//        tmComp.simulate(2000, false, false);
-        
-        tmSet.simulate(mm, m.getTagInstance(), 2000, false);
+            
+            for (ArrayList<Object> entry : results) {
+                int steps = (int) entry.get(0);
+                double executionTime = ((long) entry.get(1)) / 1000000000.0;
+                double usedMB = ((long) entry.get(2)) / (double) (1024 * 1024);
+                resultsFile.write(steps + ", " + executionTime + ", " + usedMB + "\n");
+            }
+            
+            resultsFile.close();
+        }
     }
     
     int NUM_VARS = 10;
@@ -792,7 +827,7 @@ public class Main {
             mm.add(m);
 
             System.gc();
-            int numSteps = 10000;
+            int numSteps = 1000001;
             long usedByte;
             ArrayList<ArrayList<Object>> results;
             
@@ -800,17 +835,17 @@ public class Main {
             
             switch (z) {
                 case 0:
-                    TagMachine tmComp = tmSet.compose();
+                    TagMachine tmComp = tmSet.compose(mm);
                     tmComp.startTime = startTime;
                     usedByte = tmComp.simulate(numSteps, true, false);
                     results = tmComp.results;
                     break;
                 case 1:
-                    usedByte = tmSet.simulate(numSteps, true);
+                    usedByte = tmSet.simulate(mm, new FloatTag(), numSteps, true);
                     results = tmSet.results;
                     break;
                 default:
-                    usedByte = tmSet.simulate2(null, new IntegerTag(), numSteps, true);
+                    usedByte = tmSet.simulate2(mm, new FloatTag(), numSteps, true);
                     results = tmSet.results;
                     break;
             }
@@ -821,6 +856,8 @@ public class Main {
                 double usedMB = ((long) entry.get(2)) / (double) (1024 * 1024);
                 resultsFile.write(steps + ", " + executionTime + ", " + usedMB + "\n");
             }
+            
+            resultsFile.close();
         }
     }
     
@@ -955,10 +992,10 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-//        m.runExampleEterPaper();
+        m.runExampleEterPaper();
 //        m.runExample1();
 //        m.runExpExample();
-        m.runTankExample();
+//        m.runTankExample();
 //        m.runCaldaiaExample();
 //        m.runSimulation2();
     }
