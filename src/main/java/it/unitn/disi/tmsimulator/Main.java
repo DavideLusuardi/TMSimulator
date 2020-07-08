@@ -454,12 +454,12 @@ public class Main {
             }
         };        
         mm.add(null);
-//        mm.add(null);
+        mm.add(null);
         mm.add(m);
         
         TagMachineSet tmSet = new TagMachineSet();
         tmSet.add(tmTorque);        
-//        tmSet.add(tmControl);
+        tmSet.add(tmControl);
         tmSet.add(tmPiston1);
 //        TagMachine tmComp = tmSet.compose(mm);
 //        System.out.println("TMcomposition --------------------------------------");
@@ -893,9 +893,9 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-//        m.runExampleEterPaper();
+        m.runExampleEterPaper();
 //        m.runExample1();
-        m.runExpExample();
+//        m.runExpExample();
 //        m.runTankExample();
 //        m.runCaldaiaExample();
     }

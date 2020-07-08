@@ -182,8 +182,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
     // TODO: controllare che le TMs abbiano dimensione > 0
     public long simulate(ArrayList<Morphism> tagMorphismList, Tag tagInstance, int steps, boolean random) throws Exception {
         Scanner scan = new Scanner(System.in);
-        FileWriter xFile = new FileWriter("plots/x_without_control.txt");
-        FileWriter awFile = new FileWriter("plots/aw_without_control.txt");
+        FileWriter xFile = new FileWriter("plots/x_with_control.txt");
+        FileWriter awFile = new FileWriter("plots/aw_with_control.txt");
         
         
         boolean eterComposition = (tagMorphismList != null);
@@ -291,7 +291,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                 if(unifiable){
                     HashMap<String, Var> varValuesComp = new HashMap<>(varMap.size());
                     for(int i=0; i<this.size() && unifiable; i++){
-                        TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
+                        TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();                        
                         HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues);
                         
                         for(Map.Entry<String, Var> var : varValuesTm.entrySet()){
@@ -335,7 +335,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             if(random || validEdges.size() == 1) {
                 choice = ThreadLocalRandom.current().nextInt(validEdges.size());
             } else {
-                choice = 0; // override choice to select always the same transition
+                choice = 1; // override choice to select always the same transition
                 while(choice < 0 || choice >= validEdges.size()){
                     System.out.println(validEdges);
                     System.out.print(String.format("Choose the transition [0-%d]: ", validEdges.size()));
@@ -351,8 +351,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             varValues = varValuesPrime.get(choice);
             tagVector = tpPrime.get(choice).apply(tagVector);
             
-//            xFile.write(String.format("%s %s\n", varValues.get(0).get("x11").toString(), varValues.get(0).get("x21").toString()));
-//            awFile.write(String.format("%s %s\n", tagVector.get(0).get(0).toString(), varValues.get(0).get("aw").toString()));
+//            xFile.write(String.format("%s %s\n", varValues.get("x11").toString(), varValues.get("x21").toString()));
+//            awFile.write(String.format("%s %s\n", tagVector.get(0).toString(), varValues.get("aw").toString()));
         }
 
         xFile.close();
@@ -502,14 +502,14 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 //                tpCompEdges.add(tpMap.get(transitionId.toString()));
                 
                 // controlliamo che le labeling function siano unificabili
-                if(unifiable){
+                if(unifiable){                    
                     ArrayList<HashMap<String, Var>> varValuesEdge = new ArrayList<>(this.size());
                     HashMap<String, Var> varValuesComp = new HashMap<>(varMap.size());
                     for(int i=0; i<this.size() && unifiable; i++){
                         TagPiece tp = this.get(i).getEdges().get(currentState.get(i)).get(currentEdge.get(i)).getTagPiece();
                         HashMap<String, Var> varValuesTm = tp.applyLabelingFunction(varValues.get(i));
                         varValuesEdge.add(varValuesTm);
-                        
+                                                
                         for(Map.Entry<String, Var> var : varValuesTm.entrySet()){
                             Var currentVar = varValuesComp.putIfAbsent(var.getKey(), var.getValue());
                             if(currentVar != null && !var.getValue().equals(currentVar)){
@@ -522,7 +522,7 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                     if(unifiable){
                         validEdges.add(new ArrayList<>(currentEdge));
                         varValuesPrime.add(varValuesEdge);
-                    }                        
+                    }                                            
                 }                
                 
                 // aggiornamento di currentEdge
