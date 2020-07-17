@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.unitn.disi.tmsimulator.morphism;
+package it.unitn.disi.tmsimulator.morphisms;
 
 import it.unitn.disi.tmsimulator.tags.Tag;
 

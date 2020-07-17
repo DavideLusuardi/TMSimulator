@@ -5,8 +5,8 @@
  */
 package it.unitn.disi.tmsimulator;
 
-import it.unitn.disi.tmsimulator.morphism.Morphism;
-import it.unitn.disi.tmsimulator.labelingfunction.LabelingFunction;
+import it.unitn.disi.tmsimulator.morphisms.Morphism;
+import it.unitn.disi.tmsimulator.labelingFunctions.LabelingFunction;
 import it.unitn.disi.tmsimulator.tags.Tag;
 import it.unitn.disi.tmsimulator.variables.Var;
 import java.util.ArrayList;
