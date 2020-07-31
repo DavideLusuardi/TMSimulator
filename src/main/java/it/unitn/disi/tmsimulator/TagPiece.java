@@ -245,7 +245,7 @@ public class TagPiece {
      * @param varValues valori delle variabili.
      * @return true se le labeling function sono unificabili, false altrimenti.
      */
-    public boolean isLabelingFunctionUnifiable(HashMap<String, Var> varValues){
+    public boolean areLabelingFunctionUnifiable(HashMap<String, Var> varValues){
         for(ArrayList<LabelingFunction> lflist : this.labelingFunction){
             LabelingFunction lf0 = lflist.get(0);
             Var v0 = null;

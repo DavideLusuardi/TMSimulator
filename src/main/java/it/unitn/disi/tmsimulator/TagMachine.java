@@ -203,7 +203,7 @@ public class TagMachine {
             ArrayList<Integer> nextStateIndexes = new ArrayList<>(edges.get(state).size());
             for(int j=0; j<edges.get(state).size(); j++){
                 TagPiece tp = edges.get(state).get(j).getTagPiece();
-                if(tp.isLabelingFunctionUnifiable(varValues)){
+                if(tp.areLabelingFunctionUnifiable(varValues)){
                     nextStateIndexes.add(j);
                 }
             }

@@ -55,12 +55,12 @@ public class TagMachineSet extends ArrayList<TagMachine> {
         }
         
         // mappatura stato-indice per la tag machine composizione
-        HashMap<Integer, HashMap<Integer, Integer>> mapStateIndex = new HashMap<>(tm1.getEdges().size());
+        HashMap<Integer, HashMap<Integer, Integer>> stateIndexMap = new HashMap<>(tm1.getEdges().size());
         ArrayList<ArrayList<Edge>> edges = new ArrayList<>(tm1.getEdges().size());
         edges.add(new ArrayList<>());
         HashMap<Integer, Integer> secondMap = new HashMap<>();
         secondMap.put(tm2.getInitialState(), 0);
-        mapStateIndex.put(tm1.getInitialState(), secondMap);
+        stateIndexMap.put(tm1.getInitialState(), secondMap);
         
         LinkedList<Integer> stateQueue1 = new LinkedList<>(); // coda degli stati aggiunti per TM1
         LinkedList<Integer> stateQueue2 = new LinkedList<>(); // coda degli stati aggiunti per TM2
@@ -79,11 +79,11 @@ public class TagMachineSet extends ArrayList<TagMachine> {
 
                         // controlliamo se lo stato (e1.getToState(), e2.getToState()) non esiste ancora
                         secondMap = null;
-                        if(mapStateIndex.get(e1.getToState()) == null){
+                        if(stateIndexMap.get(e1.getToState()) == null){
                             secondMap = new HashMap<>();
-                            mapStateIndex.put(e1.getToState(), secondMap);
-                        } else if(mapStateIndex.get(e1.getToState()).get(e2.getToState()) == null){
-                            secondMap = mapStateIndex.get(e1.getToState());
+                            stateIndexMap.put(e1.getToState(), secondMap);
+                        } else if(stateIndexMap.get(e1.getToState()).get(e2.getToState()) == null){
+                            secondMap = stateIndexMap.get(e1.getToState());
                         }
                         
                         if(secondMap != null){
@@ -93,8 +93,8 @@ public class TagMachineSet extends ArrayList<TagMachine> {
                             edges.add(new ArrayList<>()); // aggiungo il nuovo stato (inizialmente senza transizioni)
                         }
                         
-                        int fromState = mapStateIndex.get(e1.getFromState()).get(e2.getFromState());
-                        int toState = mapStateIndex.get(e1.getToState()).get(e2.getToState());
+                        int fromState = stateIndexMap.get(e1.getFromState()).get(e2.getFromState());
+                        int toState = stateIndexMap.get(e1.getToState()).get(e2.getToState());
                         Edge e = new Edge(fromState, toState, tp);
                         edges.get(fromState).add(e);
                     }
@@ -102,12 +102,12 @@ public class TagMachineSet extends ArrayList<TagMachine> {
             }
         }
         
-        int initialState = mapStateIndex.get(tm1.getInitialState()).get(tm2.getInitialState());
+        int initialState = stateIndexMap.get(tm1.getInitialState()).get(tm2.getInitialState());
         ArrayList<Integer> acceptingStates = new ArrayList<>();
         for(int i : tm1.getAcceptingStates()){
             for(int j : tm2.getAcceptingStates()){
-                if(mapStateIndex.get(i) != null && mapStateIndex.get(i).get(j) != null)
-                    acceptingStates.add(mapStateIndex.get(i).get(j));
+                if(stateIndexMap.get(i) != null && stateIndexMap.get(i).get(j) != null)
+                    acceptingStates.add(stateIndexMap.get(i).get(j));
             }
         }
         
