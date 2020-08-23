@@ -5,7 +5,6 @@
  */
 package it.unitn.disi.tmsimulator.labelingFunctions;
 
-import it.unitn.disi.tmsimulator.labelingFunctions.LabelingFunction;
 import it.unitn.disi.tmsimulator.variables.FloatVar;
 import it.unitn.disi.tmsimulator.variables.Var;
 import java.util.HashMap;

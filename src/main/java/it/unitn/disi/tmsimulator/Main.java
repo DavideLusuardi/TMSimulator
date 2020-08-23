@@ -505,6 +505,46 @@ public class Main {
         }
     }
     
+    public void runExampleEterPaper2() throws Exception {
+        
+        TagMachine tmTorque = generateTorqueTMPaper();
+        TagMachine tmControl = generateControlTMPaper();
+        TagMachine tmPiston1 = generatePiston1TMPaper();
+
+        TagMachineSet tmSet = new TagMachineSet();
+        tmSet.add(tmTorque);
+//        tmSet.add(tmControl);
+        tmSet.add(tmPiston1);
+
+        ArrayList<Morphism> mm = new ArrayList<>();
+        Morphism m = new Morphism() {
+            @Override
+            public Tag map(Tag tag) throws Exception {
+                if (tag.isEpsilon()) {
+                    return getTagInstance().getEpsilon();
+                } else {
+                    return new FloatTag(((float) 0.0011810) * ((IntegerTag) tag).getTag());
+                }
+            }
+
+            @Override
+            public Tag getTagInstance() {
+                return new FloatTag();
+            }
+        };
+        mm.add(null);
+//        mm.add(null);
+        mm.add(m);            
+
+        System.out.println("start simulation");
+        long startTime = System.nanoTime();
+
+        TagMachine tmComp = tmSet.compose(mm);
+        tmComp.startTime = startTime;
+        tmComp.simulate(2000, false, false);
+
+    }
+    
     int NUM_VARS = 10;
     int NUM_STATES = 4;
     int NUM_TM = 4;
@@ -836,10 +876,10 @@ public class Main {
     }
     
     public void runTankExample() throws Exception {
-        
+        RND=true;
         for(int z=0; z<simulationName.length; z++){
             String sn = simulationName[z];
-            FileWriter resultsFile = new FileWriter(String.format("plots/tank_results_%s.csv", sn));
+            FileWriter resultsFile = new FileWriter(String.format("plots/tank_results_%s_rnd.csv", sn));
             resultsFile.write("steps, time(s), memory(MB)\n");
 
             TagMachine tankTM = generateTank();
@@ -1033,11 +1073,11 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         Main m = new Main();
-//        m.runExampleEterPaper();
+//        m.runExampleEterPaper2();
 //        m.runExample1();
 //        m.runExample2();
 //        m.runExpExample();
-//        m.runTankExample();
+        m.runTankExample();
 //        m.runCaldaiaExample();
 //        m.runSimulation2();
 //        m.runTMSteps();
